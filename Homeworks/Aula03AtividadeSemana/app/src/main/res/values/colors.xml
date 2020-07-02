@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Cores do Sistema - Material Design -->
+    <color name="colorPrimary">#D7CEFD</color>
+    <color name="colorPrimaryDark">#A18BFB</color>
+    <color name="colorAccent">#673AB7</color>
+    <!-- Cores de Texto -->
+    <color name="colorText">#333333</color>
+    <color name="colorTextDark">#EEEEEE</color>
+    <!-- Cores de Menu -->
+    <color name="colorMenuBg">#A18BFB</color>
+    <color name="colorMenuText">#FFFFFF</color>
+</resources>

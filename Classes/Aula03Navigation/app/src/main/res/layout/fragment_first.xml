@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FirstFragment"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Primeiro Fragmento"
+        android:layout_margin="10dp"
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        android:textStyle="bold"
+        android:textColor="#673AB7"/>
+
+    <Button
+        android:id="@+id/btnNext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Próximo Fragmento"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"/>
+
+</LinearLayout>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Aula01VoteApp</string>
+    <string name="label_title">Voting</string>
+    <string name="name_kb" translatable="false">Kb</string>
+    <string name="name_lula" translatable="false">Lula</string>
+    <string name="name_r10" translatable="false">R10</string>
+    <string name="button_title">Vote</string>
+</resources>

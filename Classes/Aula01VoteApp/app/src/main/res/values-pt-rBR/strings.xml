@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Aula01VoteApp</string>
+    <string name="label_title">Votação</string>
+    <string name="button_title">Votar</string>
+</resources>

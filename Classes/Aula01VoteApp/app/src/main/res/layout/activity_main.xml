@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_title"
+        android:layout_gravity="center"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#673AB7"
+        android:layout_margin="5dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center">
+
+    <ImageView
+        android:id="@+id/imgKb"
+        android:layout_width="120dp"
+        android:layout_height="180dp"
+        android:src="@drawable/kb"
+        android:layout_margin="5dp"
+        android:contentDescription="@string/name_kb" />
+
+    <ImageView
+        android:id="@+id/imgLula"
+        android:layout_width="120dp"
+        android:layout_height="180dp"
+        android:src="@drawable/lula"
+        android:layout_margin="5dp"
+        android:contentDescription="@string/name_lula" />
+
+    <ImageView
+        android:id="@+id/imgR10"
+        android:layout_width="120dp"
+        android:layout_height="180dp"
+        android:src="@drawable/r10"
+        android:layout_margin="5dp"
+        android:contentDescription="@string/name_r10" />
+
+    </LinearLayout>
+
+    <RadioGroup
+        android:id="@+id/grpVote"
+        android:layout_width="340dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal"
+        android:layout_gravity="end">
+
+        <RadioButton
+            android:id="@+id/optKb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/name_kb"
+            android:layout_weight="1"/>
+
+        <RadioButton
+            android:id="@+id/optLula"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/name_lula"
+            android:layout_weight="1"/>
+
+        <RadioButton
+            android:id="@+id/optR10"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/name_r10"
+            android:layout_weight="1"/>
+
+    </RadioGroup>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|bottom">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_title"
+            android:layout_margin="10dp"
+            android:onClick="btnVoteOnClick"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

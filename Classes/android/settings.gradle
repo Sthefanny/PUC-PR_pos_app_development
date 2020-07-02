@@ -1,0 +1,2 @@
+rootProject.name='PUCPR Primeiro App'
+include ':app'

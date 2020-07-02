@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Aula02MenuApp</string>
+    <string name="mnu_background">Cor de Fundo</string>
+    <string name="mnu_bg_green">Verde</string>
+    <string name="mnu_bg_blue">Azul</string>
+    <string name="mnu_bg_red">Vermelho</string>
+    <string name="mnu_bg_white">Branco</string>
+    <string name="mnu_about">Sobre</string>
+    <string name="collapsingTitle">Cidades</string>
+    <string name="strCidade">Cidade:</string>
+    <string name="strPopulacao">População:</string>
+</resources>

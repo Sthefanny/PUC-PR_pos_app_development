@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Aula01Homework01</string>
+    <string name="valueLula">Lula</string>
+    <string name="valueR10">R10</string>
+    <string name="valueVoting">Voting</string>
+    <string name="valueKb">Kb</string>
+    <string name="valueVote">Vote</string>
+</resources>
