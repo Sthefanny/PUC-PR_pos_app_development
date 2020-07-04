@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/voteFragment"
+        android:icon="@drawable/ic_vote"
+        android:title="Cédula" />
+    <item
+        android:id="@+id/countFragment"
+        android:icon="@drawable/ic_count"
+        android:title="Apuração" />
+</menu>

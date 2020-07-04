@@ -8,10 +8,7 @@
 
 # Screenshots
 
-![](https://raw.githubusercontent.com/Sthefanny/PUC-PR_pos_app_development/Homeworks/Desenvolvimento de Aplicativos em Android/Aula03AtividadeSemana/master/screenshots/home.png)
-
-![](https://raw.githubusercontent.com/Sthefanny/PUC-PR_pos_app_development/Homeworks/Desenvolvimento de Aplicativos em Android/Aula03AtividadeSemana/master/screenshots/add.png)
-
-![](https://raw.githubusercontent.com/Sthefanny/PUC-PR_pos_app_development/Homeworks/Desenvolvimento de Aplicativos em Android/Aula03AtividadeSemana/master/screenshots/edit.png)
-
-![](https://raw.githubusercontent.com/Sthefanny/PUC-PR_pos_app_development/Homeworks/Desenvolvimento de Aplicativos em Android/Aula03AtividadeSemana/master/screenshots/delete.png)
+![](screenshots/home.png)
+![](screenshots/add.png)
+![](screenshots/edit.png)
+![](screenshots/delete.png)

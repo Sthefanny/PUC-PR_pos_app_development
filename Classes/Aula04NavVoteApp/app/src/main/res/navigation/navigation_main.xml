@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_main"
+    app:startDestination="@id/voteFragment">
+
+    <fragment
+        android:id="@+id/voteFragment"
+        android:name="br.com.sthefanny.aula04navvoteapp.controller.VoteFragment"
+        android:label="fragment_vote"
+        tools:layout="@layout/fragment_vote" >
+        <action
+            android:id="@+id/action_voteFragment_to_confirmFragment"
+            app:destination="@id/confirmFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/confirmFragment"
+        android:name="br.com.sthefanny.aula04navvoteapp.controller.ConfirmFragment"
+        android:label="fragment_confirm"
+        tools:layout="@layout/fragment_confirm" >
+        <action
+            android:id="@+id/action_confirmFragment_to_voteFragment"
+            app:destination="@id/voteFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/countFragment"
+        android:name="br.com.sthefanny.aula04navvoteapp.controller.CountFragment"
+        android:label="fragment_count"
+        tools:layout="@layout/fragment_count" />
+</navigation>
