@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Aula02RecyclerView</string>
+    <string name="collapsinTitle">Cidades</string>
+
+    <string name="file_preferences">cities_preferences</string>
+    <string name="pref_remember">remember</string>
+    <string name="pref_login">login</string>
+    <string name="pref_password">password</string>
+
+    <string name="filename_cities">cities.txt</string>
+    <string name="filename_states">states.txt</string>
+</resources>
