@@ -67,9 +67,11 @@ object DataStore {
             file.bufferedReader().use {
                 val iterator = it.lineSequence().iterator()
                 while (iterator.hasNext()) {
-                    var number = iterator.next()
-                    val name = iterator.next()
-                    val image = iterator.next()
+                    var line = iterator.next()
+                    var items = line.split("|")
+                    var number = items[0]
+                    val name = items[1]
+                    val image = items[2]
 
                     var pokemon = Pokemon(number, name, image)
                     addPokemon(pokemon)
@@ -94,9 +96,8 @@ object DataStore {
 
         file.printWriter().use {
             for (pokemon in pokemons) {
-                it.println(pokemon.number)
-                it.println(pokemon.name)
-                it.println(pokemon.image)
+                var line = "${pokemon.number}|${pokemon.name}|${pokemon.image}"
+                it.println(line)
             }
         }
     }
@@ -110,9 +111,11 @@ object DataStore {
             file.bufferedReader().use {
                 val iterator = it.lineSequence().iterator()
                 while (iterator.hasNext()) {
-                    var number = iterator.next()
-                    val name = iterator.next()
-                    val image = iterator.next()
+                    var line = iterator.next()
+                    var items = line.split("|")
+                    var number = items[0]
+                    val name = items[1]
+                    val image = items[2]
 
                     var pokemon = Pokemon(number, name, image)
                     addPokemon(pokemon)

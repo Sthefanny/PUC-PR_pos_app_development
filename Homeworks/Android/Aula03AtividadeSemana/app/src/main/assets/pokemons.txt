@@ -1,9 +1,3 @@
-001
-Bulbasaur
-https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png
-002
-Ivysaur
-https://assets.pokemon.com/assets/cms2/img/pokedex/full/002.png
-003
-Venusaur
-https://assets.pokemon.com/assets/cms2/img/pokedex/full/003.png
+001|Bulbasaur|https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png
+002|Ivysaur|https://assets.pokemon.com/assets/cms2/img/pokedex/full/002.png
+003|Venusaur|https://assets.pokemon.com/assets/cms2/img/pokedex/full/003.png
