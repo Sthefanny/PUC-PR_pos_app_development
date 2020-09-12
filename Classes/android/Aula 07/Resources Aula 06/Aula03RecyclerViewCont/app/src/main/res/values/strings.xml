@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Aula02RecyclerView</string>
+    <string name="collapsinTitle">Cidades</string>
+</resources>
