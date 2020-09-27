@@ -11,7 +11,8 @@ import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
 
-object DataStore {
+object
+DataStore {
 
     var cities: MutableList<City> = arrayListOf()
         private set
