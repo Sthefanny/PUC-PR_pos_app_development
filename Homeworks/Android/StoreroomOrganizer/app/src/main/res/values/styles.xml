@@ -7,4 +7,47 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- Removendo a Action Bar padrão. -->
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- Configurações da Toolbar -->
+    <style name="AppTheme.Toolbar">
+        <item name="android:textColorPrimary">@color/colorTextDark</item>
+        <item name="android:textColorSecondary">@color/colorTextDark</item>
+        <item name="actionOverflowMenuStyle">@style/OverflowMenu</item>
+        <item name="textAppearanceLargePopupMenu">@style/OverflowMenu</item>
+    </style>
+
+    <style name="OverflowMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:popupBackground">@color/colorMenuBg</item>
+        <item name="android:textColor">@color/colorMenuText</item>
+        <item name="android:textSize">@dimen/text_size_menu_toolbar</item>
+    </style>
+
+    <!-- Configurações da CollapsingToolbar -->
+    <style name="AppTheme.CollapsinToolbarCollapsed" parent="@android:style/TextAppearance">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+    <style name="AppTheme.CollapsinToolbarExpanded" parent="@android:style/TextAppearance">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <!-- Configurações de texto -->
+    <style name="AppTheme.Light">
+        <item name="android:textColor">@color/colorText</item>
+    </style>
+
+    <style name="AppTheme.Dark">
+        <item name="android:textColor">@color/colorTextDark</item>
+    </style>
+
+    <style name="AppTheme.EditText" parent="AppTheme.Light">
+        <item name="android:textSize">14sp</item>
+    </style>
+
 </resources>

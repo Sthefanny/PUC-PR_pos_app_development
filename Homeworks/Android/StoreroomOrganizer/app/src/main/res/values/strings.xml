@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Storeroom Organizer</string>
+
+    <string name="file_preferences">storeroom_preferences</string>
+    <string name="pref_remember">remember</string>
+    <string name="pref_login">login</string>
+    <string name="pref_password">password</string>
+
+    <string name="login">Email</string>
+    <string name="password">Senha</string>
+    <string name="remember">Lembrar</string>
+    <string name="signin">Entrar</string>
 </resources>
