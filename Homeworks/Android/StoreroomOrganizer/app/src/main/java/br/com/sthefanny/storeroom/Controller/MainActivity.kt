@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import br.com.sthefanny.storeroom.Controller.Interfaces.LoadReceiverDelegate
 import br.com.sthefanny.storeroom.Model.DataStore
 import br.com.sthefanny.storeroom.R
-import br.com.sthefanny.storeroom.View.ItemsAdapter
+import br.com.sthefanny.storeroom.View.StoreAdapter
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity(), LoadReceiverDelegate {
     val REQUEST_CODE_ADD = 1
     val REQUERT_CODE_UPDATE = 2
 
-    private var adapter: ItemsAdapter? = null
+    private var adapter: StoreAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -31,19 +31,19 @@ class MainActivity : AppCompatActivity(), LoadReceiverDelegate {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        DataStore.loadAllItems(this)
+        DataStore.loadAllItemsFromStore(this)
 
         fab.setOnClickListener {
-            val intent = Intent(this@MainActivity, ManagerItemActivity::class.java).apply {
+            val intent = Intent(this@MainActivity, ManagerStoreActivity::class.java).apply {
                 putExtra("type", 1)
             }
             startActivityForResult(intent, REQUEST_CODE_ADD)
         }
 
         val layoutManager = LinearLayoutManager(this)
-        rcvItems.layoutManager = layoutManager
-        adapter = ItemsAdapter(DataStore.items)
-        rcvItems.adapter = adapter
+        rcvStores.layoutManager = layoutManager
+        adapter = StoreAdapter(DataStore.stores)
+        rcvStores.adapter = adapter
 
         updateCollapsinTitle()
 
@@ -53,13 +53,13 @@ class MainActivity : AppCompatActivity(), LoadReceiverDelegate {
 
                 e?.let {
 
-                    val view = rcvItems.findChildViewUnder(e.x, e.y)
+                    val view = rcvStores.findChildViewUnder(e.x, e.y)
                     view?.let {
 
-                        val position = rcvItems.getChildAdapterPosition(view)
-                        val city = DataStore.getItem(position)
+                        val position = rcvStores.getChildAdapterPosition(view)
+                        val city = DataStore.getItemFromStore(position)
 
-                        val intent = Intent(this@MainActivity, ManagerItemActivity::class.java).apply {
+                        val intent = Intent(this@MainActivity, ManagerStoreActivity::class.java).apply {
                             putExtra("type", 2)
                             putExtra("position", position)
                         }
@@ -76,19 +76,19 @@ class MainActivity : AppCompatActivity(), LoadReceiverDelegate {
 
                 e?.let {
 
-                    val view = rcvItems.findChildViewUnder(e.x, e.y)
+                    val view = rcvStores.findChildViewUnder(e.x, e.y)
                     view?.let {
 
-                        val position = rcvItems.getChildAdapterPosition(view)
-                        val item = DataStore.getItem(position)
+                        val position = rcvStores.getChildAdapterPosition(view)
+                        val store = DataStore.getItemFromStore(position)
 
                         val dialog = AlertDialog.Builder(this@MainActivity)
                         dialog.setTitle("Organizador de Despensa")
                         dialog.setMessage("Tem certeza que deseja excluir este produto?")
                         dialog.setPositiveButton("Excluir", DialogInterface.OnClickListener { dialog, which ->
-                            DataStore.removeItem(position, this@MainActivity)
+                            DataStore.removeItemFromStore(position, this@MainActivity)
                             adapter!!.notifyDataSetChanged()
-                            Snackbar.make(layMain, "Produto excluído: ${item.name}", Snackbar.LENGTH_LONG).show()
+                            Snackbar.make(layMain, "Produto excluído: ${store.productName}", Snackbar.LENGTH_LONG).show()
                             updateCollapsinTitle()
                         })
                         dialog.setNegativeButton("Cancelar", null)
@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity(), LoadReceiverDelegate {
             }
         })
 
-        rcvItems.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+        rcvStores.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
             override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
                 TODO("Not yet implemented")
             }
@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity(), LoadReceiverDelegate {
 
     fun updateCollapsinTitle() {
 
-        collapsingToolbar.title = "${getString(R.string.collapsinTitle)} (${DataStore.items.size})"
+        collapsingToolbar.title = "${getString(R.string.collapsinTitle)} (${DataStore.stores.size})"
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -142,7 +142,7 @@ class MainActivity : AppCompatActivity(), LoadReceiverDelegate {
                 Snackbar.make(layMain, "Produto adicionado: ${name}", Snackbar.LENGTH_LONG).show()
                 adapter!!.notifyDataSetChanged()
                 updateCollapsinTitle()
-                DataStore.loadAllItems(this)
+                DataStore.loadAllItemsFromStore(this)
             }
         }
 
@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity(), LoadReceiverDelegate {
 
                 Snackbar.make(layMain, "Produto alterado: ${name}", Snackbar.LENGTH_LONG).show()
                 adapter!!.notifyDataSetChanged()
-                DataStore.loadAllItems(this)
+                DataStore.loadAllItemsFromStore(this)
             }
         }
     }

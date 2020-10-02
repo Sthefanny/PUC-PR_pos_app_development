@@ -30,11 +30,11 @@
     <!-- Configurações da CollapsingToolbar -->
     <style name="AppTheme.CollapsinToolbarCollapsed" parent="@android:style/TextAppearance">
         <item name="android:textSize">20sp</item>
-        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textColor">#FFFFFF</item>
     </style>
     <style name="AppTheme.CollapsinToolbarExpanded" parent="@android:style/TextAppearance">
         <item name="android:textSize">28sp</item>
-        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textColor">#FFFFFF</item>
     </style>
 
     <!-- Configurações de texto -->

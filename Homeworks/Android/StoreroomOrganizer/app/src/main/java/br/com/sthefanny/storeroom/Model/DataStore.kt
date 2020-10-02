@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.util.Log
 import br.com.sthefanny.storeroom.Controller.Interfaces.LoadReceiverDelegate
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -19,6 +20,8 @@ object DataStore {
     var password = "123456"
         private set
 
+    val baseUrl = "http://192.168.0.115:4001"
+
     private lateinit var myContext: Context
 
 
@@ -26,29 +29,33 @@ object DataStore {
         myContext = context
     }
 
-    var items: MutableList<Item> = arrayListOf()
+    var stores: MutableList<Store> = arrayListOf()
         private set
 
-    fun getItem(position: Int): Item {
-        return items.get(position)
+    fun loadAllItemsFromStore(delegate: LoadReceiverDelegate) {
+        TaskLoadStores(delegate).execute("$baseUrl/Store/list")
     }
 
-    fun addItem(city: Item, delegate: LoadReceiverDelegate) {
-        TaskAddItem(city, delegate).execute("")
+    fun getItemFromStore(position: Int): Store {
+        return stores.get(position)
+    }
+
+    fun addItemToStore(city: Store, delegate: LoadReceiverDelegate) {
+        TaskAddStore(city, delegate).execute("$baseUrl/Store")
 //        cities.add(city)
     }
 
-    fun editCity(city: Item, position: Int, delegate: LoadReceiverDelegate) {
-        TaskEditItem(city, delegate).execute("")
+    fun editItemFromStore(city: Store, position: Int, delegate: LoadReceiverDelegate) {
+        TaskEditStore(city, delegate).execute("$baseUrl/Store")
 //        cities.set(position, city)
     }
 
-    fun removeItem(position: Int, delegate: LoadReceiverDelegate) {
-        TaskRemoveItem(getItem(position), delegate).execute("")
+    fun removeItemFromStore(position: Int, delegate: LoadReceiverDelegate) {
+        TaskRemoveStore(getItemFromStore(position), delegate).execute("$baseUrl/Store/")
     }
 
-    fun clearItems() {
-        items.clear()
+    fun clearAllItemsFromStore() {
+        stores.clear()
     }
 
     fun getRequest(endPoint: String, method: String, parameter: String?): String {
@@ -101,11 +108,7 @@ object DataStore {
         return jsonStr.toString()
     }
 
-    fun loadAllItems(delegate: LoadReceiverDelegate) {
-        TaskLoadItems(delegate).execute("")
-    }
-
-    class TaskLoadItems(var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
+    class TaskLoadStores(var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
         override fun doInBackground(vararg params: String): String {
             return getRequest(params.first(), "GET", null)
         }
@@ -114,23 +117,23 @@ object DataStore {
             super.onPostExecute(jsonStr)
 
             try {
-                val json = JSONObject(jsonStr)
-                val itemsArray = json.getJSONArray("items")
+                val storesArray = JSONArray(jsonStr)
 
-                items.clear()
+                stores.clear()
 
-                for (i in 0 until itemsArray.length()) {
-                    val item = itemsArray[i] as JSONObject
+                for (i in 0 until storesArray.length()) {
+                    val store = storesArray[i] as JSONObject
 
-                    val idItem = item.getInt("idItem")
-                    val image = item.getString("image")
-                    val name = item.getString("name")
-                    val quantity = item.getInt("quantity")
+                    val idStore = store.getInt("id")
+                    val productId = store.getInt("productId")
+                    val productName = store.getString("product")
+                    val quantity = store.getInt("quantity")
+                    val unitMeasurement = store.getInt("unitMea")
 
-                    val newItem = Item(image, name, quantity)
-                    newItem.id = idItem
+                    val newStore = Store(productId, productName, quantity, unitMeasurement)
+                    newStore.id = idStore
 
-                    items.add(newItem)
+                    stores.add(newStore)
                 }
 
                 delegate.setStatus(true)
@@ -142,12 +145,13 @@ object DataStore {
         }
     }
 
-    class TaskAddItem(var item: Item, var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
+    class TaskAddStore(var store: Store, var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
         override fun doInBackground(vararg params: String): String {
             val builder = Uri.Builder()
-            builder.appendQueryParameter("image", item.image)
-            builder.appendQueryParameter("name", item.name)
-            builder.appendQueryParameter("quantity", item.quantity.toString())
+            builder.appendQueryParameter("productId", store.productId.toString())
+            builder.appendQueryParameter("product", store.productName)
+            builder.appendQueryParameter("quantity", store.quantity.toString())
+            builder.appendQueryParameter("unitMea", store.unitMeasurement.toString())
             val parameters = builder.build().encodedQuery
 
             return getRequest(params.first(), "POST", parameters)
@@ -161,7 +165,7 @@ object DataStore {
                 val result = json.getString("resultCode")
 
                 if (result.equals("codeOk")) {
-                    item.id = json.getInt("iditem")
+                    store.id = json.getInt("id")
                     delegate.setStatus(true)
                 }
                 else {
@@ -176,16 +180,17 @@ object DataStore {
         }
     }
 
-    class TaskEditItem(var item: Item, var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
+    class TaskEditStore(var store: Store, var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
         override fun doInBackground(vararg params: String): String {
             val builder = Uri.Builder()
-            builder.appendQueryParameter("iditem", item.id.toString())
-            builder.appendQueryParameter("image", item.image)
-            builder.appendQueryParameter("name", item.name)
-            builder.appendQueryParameter("quantity", item.quantity.toString())
+            builder.appendQueryParameter("id", store.id.toString())
+            builder.appendQueryParameter("productId", store.productId.toString())
+            builder.appendQueryParameter("product", store.productName)
+            builder.appendQueryParameter("quantity", store.quantity.toString())
+            builder.appendQueryParameter("unitMea", store.unitMeasurement.toString())
             val parameters = builder.build().encodedQuery
 
-            return getRequest(params.first(), "POST", parameters)
+            return getRequest(params.first(), "PUT", parameters)
         }
 
         override fun onPostExecute(jsonStr: String) {
@@ -210,13 +215,13 @@ object DataStore {
         }
     }
 
-    class TaskRemoveItem(var item: Item, var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
+    class TaskRemoveStore(var store: Store, var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
         override fun doInBackground(vararg params: String): String {
             val builder = Uri.Builder()
-            builder.appendQueryParameter("iditem", item.id.toString())
+            builder.appendQueryParameter("id", store.id.toString())
             val parameters = builder.build().encodedQuery
 
-            return getRequest(params.first(), "POST", parameters)
+            return getRequest(params.first(), "DELETE", parameters)
         }
 
         override fun onPostExecute(jsonStr: String) {
@@ -227,7 +232,7 @@ object DataStore {
                 val result = json.getString("resultCode")
 
                 if (result.equals("codeOk")) {
-                    loadAllItems(delegate)
+                    loadAllItemsFromStore(delegate)
                 }
                 else {
                     Log.d("Error!", "Operação de atualização falhou!!!")

@@ -7,12 +7,12 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import br.com.sthefanny.storeroom.Controller.Interfaces.LoadReceiverDelegate
 import br.com.sthefanny.storeroom.Model.DataStore
-import br.com.sthefanny.storeroom.Model.Item
+import br.com.sthefanny.storeroom.Model.Store
 import br.com.sthefanny.storeroom.R
-import kotlinx.android.synthetic.main.activity_manager_item.*
-import kotlinx.android.synthetic.main.rcv_items.*
+import kotlinx.android.synthetic.main.activity_manager_store.*
+import kotlinx.android.synthetic.main.rcv_stores.*
 
-class ManagerItemActivity : AppCompatActivity(), LoadReceiverDelegate {
+class ManagerStoreActivity : AppCompatActivity(), LoadReceiverDelegate {
 
     var position = 0
     var type = 0
@@ -20,45 +20,45 @@ class ManagerItemActivity : AppCompatActivity(), LoadReceiverDelegate {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_manager_item)
+        setContentView(R.layout.activity_manager_store)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Gerenciar Cidade"
+        supportActionBar?.title = "Gerenciar Itens na Dispensa"
 
         type = intent.getIntExtra("type", 1)
 
         if (type == 2) {
 
             position = intent.getIntExtra("position", 0)
-            val city = DataStore.getItem(position)
+            val city = DataStore.getItemFromStore(position)
 
-            txtCity.setText(city.name)
+            txtCity.setText(city.productName)
             txtPeople.setText(city.quantity.toString())
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
 
-        menuInflater.inflate(R.menu.menu_manager_item, menu)
+        menuInflater.inflate(R.menu.menu_manager_store, menu)
 
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(store: MenuItem): Boolean {
 
-        when(item.itemId) {
+        when(store.itemId) {
             R.id.mnuSave -> {
 
-                val item = Item(imgItem.toString(), txtCity.text.toString(), txtQuantity.text.toString().toInt())
-                name = item.name
+                val store = Store(0, txtProductName.text.toString(), txtQuantity.text.toString().toInt(), txtUnitMeasurement.text.toString().toInt())
+                name = store.productName
 
                 if (type == 1) {
 
-                    DataStore.addItem(item, this)
+                    DataStore.addItemToStore(store, this)
                 }
                 else if (type == 2) {
-                    item.id = DataStore.getItem(position).id
-                    DataStore.editCity(item, position, this)
+                    store.id = DataStore.getItemFromStore(position).id
+                    DataStore.editItemFromStore(store, position, this)
                 }
             }
             android.R.id.home -> {
@@ -66,7 +66,7 @@ class ManagerItemActivity : AppCompatActivity(), LoadReceiverDelegate {
             }
         }
 
-        return super.onOptionsItemSelected(item)
+        return super.onOptionsItemSelected(store)
     }
 
     override fun setStatus(status: Boolean) {

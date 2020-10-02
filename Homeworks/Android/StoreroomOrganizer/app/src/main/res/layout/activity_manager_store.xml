@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Controller.ManagerItemActivity"
-    android:id="@+id/layManagerItem">
+    tools:context=".Controller.ManagerStoreActivity"
+    android:id="@+id/layManagerStore">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
