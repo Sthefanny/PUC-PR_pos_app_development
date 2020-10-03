@@ -14,4 +14,5 @@
 
     <string name="PACK">Unidade</string>
     <string name="WEIGHT">Peso</string>
+    <string name="lblAdd">Adicionar</string>
 </resources>

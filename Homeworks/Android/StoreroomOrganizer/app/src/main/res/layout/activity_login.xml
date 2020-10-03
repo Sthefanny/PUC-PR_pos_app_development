@@ -72,6 +72,21 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginLeft="20dp">
+
+            <TextView
+                android:id="@+id/txtBtnCreateUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Criar usuário"
+                android:onClick="goToAddUserOnClick"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout

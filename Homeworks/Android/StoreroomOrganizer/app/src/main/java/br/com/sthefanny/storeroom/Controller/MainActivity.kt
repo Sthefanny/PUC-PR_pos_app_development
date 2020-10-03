@@ -169,4 +169,5 @@ class MainActivity : AppCompatActivity(), LoadReceiverDelegate {
             Log.d("Error!", "Algo deu errado!!!")
         }
     }
+
 }

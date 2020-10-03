@@ -1,7 +1,6 @@
 package br.com.sthefanny.storeroom.Model
 
 import android.content.Context
-import android.net.Uri
 import android.os.AsyncTask
 import android.util.Log
 import br.com.sthefanny.storeroom.Controller.Interfaces.LoadReceiverDelegate
@@ -15,12 +14,8 @@ import java.net.URL
 
 object DataStore {
 
-    var login = "teste"
-        private set
-    var password = "123456"
-        private set
-
     val baseUrl = "http://gonzagahouse.ddns-intelbrs.com.br:600"
+//    val baseUrl = "http://192.168.0.115:4001"
 
     var accessToken: String = ""
 
@@ -59,11 +54,11 @@ object DataStore {
     }
 
     fun editItemFromStore(city: Store, position: Int, delegate: LoadReceiverDelegate) {
-        TaskEditStore(city, delegate).execute("$baseUrl/Store/teste")
+        TaskEditStore(city, delegate).execute("$baseUrl/Store")
     }
 
     fun removeItemFromStore(position: Int, delegate: LoadReceiverDelegate) {
-        TaskRemoveStore(getItemFromStore(position), delegate).execute("$baseUrl/Store/delete")
+        TaskRemoveStore(getItemFromStore(position), delegate).execute("$baseUrl/Store")
     }
 
     fun clearAllItemsFromStore() {
@@ -86,7 +81,15 @@ object DataStore {
         products.clear()
     }
 
-    fun getRequest(endPoint: String, method: String, parameter: String?): String {
+    fun addUser(user: User, delegate: LoadReceiverDelegate) {
+        TaskAddUser(user, delegate).execute("$baseUrl/User")
+    }
+
+    fun loginUser(user: User, delegate: LoadReceiverDelegate) {
+        TaskLoginUser(user, delegate).execute("$baseUrl/User/login")
+    }
+
+    fun getRequest(endPoint: String, method: String, parameters: JSONObject?, auth: Boolean): String {
         val jsonStr = StringBuffer()
 
         val url = URL(endPoint)
@@ -96,19 +99,26 @@ object DataStore {
 
         connection.readTimeout = 50000000
         connection.connectTimeout = 500000000
-        connection.setRequestProperty("Authorization", "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyIiwidXNlck5hbWUiOiJTdGhlZmFubnkiLCJuYmYiOjE2MDE2Nzk0MzksImV4cCI6MTYwNDI3MTQzOSwiaWF0IjoxNjAxNjc5NDM5LCJpc3MiOiJTdG9yZVJvb20iLCJhdWQiOiJFdmVyeW9uZSJ9.EYA0m_G9HexLwh0S0WxeKzwkN2pCY0i08fbsakeNjZEK30LVSAkePMCTfS3W0fvyinJF4zAtWB-D2f1xQmJhhA");
+
+        if (auth) {
+            connection.setRequestProperty(
+                "Authorization",
+                accessToken
+            )
+        }
+        connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
 
         connection.doInput = true
-        if (method.equals("POST") || method.equals("PUT")) {
+        if (method != "GET") {
             connection.doOutput = true
         }
 
         try {
             connection.connect()
 
-            parameter?.let {
+            parameters?.let {
                 OutputStreamWriter(connection.outputStream, "UTF-8").use {
-                    it.write(parameter)
+                    it.write(parameters.toString())
                     it.flush()
                 }
             }
@@ -139,7 +149,7 @@ object DataStore {
 
     class TaskLoadStores(var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
         override fun doInBackground(vararg params: String): String {
-            return getRequest(params.first(), "GET", null)
+            return getRequest(params.first(), "GET", null, true)
         }
 
         override fun onPostExecute(jsonStr: String) {
@@ -176,14 +186,13 @@ object DataStore {
 
     class TaskAddStore(var store: Store, var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
         override fun doInBackground(vararg params: String): String {
-            val builder = Uri.Builder()
-            builder.appendQueryParameter("productId", store.productId.toString())
-            builder.appendQueryParameter("product", store.productName)
-            builder.appendQueryParameter("quantity", store.quantity.toString())
-            builder.appendQueryParameter("unitMea", store.unitMeasurement.toString())
-            val parameters = builder.build().encodedQuery
+            val parameters = JSONObject()
+            parameters.put("productId", store.productId)
+            parameters.put("product", store.productName)
+            parameters.put("quantity", store.quantity)
+            parameters.put("unitMea", store.unitMeasurement)
 
-            return getRequest(params.first(), "POST", parameters)
+            return getRequest(params.first(), "POST", parameters, true)
         }
 
         override fun onPostExecute(jsonStr: String) {
@@ -201,20 +210,25 @@ object DataStore {
 
     class TaskEditStore(var store: Store, var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
         override fun doInBackground(vararg params: String): String {
-            val builder = Uri.Builder()
-            builder.appendQueryParameter("id", store.id.toString())
-            builder.appendQueryParameter("productId", store.productId.toString())
-            builder.appendQueryParameter("quantity", store.quantity.toString())
-            builder.appendQueryParameter("unitMea", store.unitMeasurement.toString())
-            val parameters = builder.build().encodedQuery
+            val parameters = JSONObject()
+            parameters.put("id", store.id)
+            parameters.put("productId", store.productId)
+            parameters.put("quantity", store.quantity)
+            parameters.put("unitMea", store.unitMeasurement)
 
-            return getRequest(params.first(), "POST", parameters)
+            return getRequest(params.first(), "PUT", parameters, true)
         }
 
         override fun onPostExecute(jsonStr: String) {
             super.onPostExecute(jsonStr)
 
             try {
+                if(jsonStr.isNotEmpty()) {
+                    delegate.setStatus(true)
+                }
+                else{
+                    delegate.setStatus(false)
+                }
                 loadAllItemsFromStore(delegate)
             }
             catch (e: Exception) {
@@ -226,24 +240,17 @@ object DataStore {
 
     class TaskRemoveStore(var store: Store, var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
         override fun doInBackground(vararg params: String): String {
-            val builder = Uri.Builder()
-            builder.appendQueryParameter("id", store.id.toString())
-            val parameters = builder.build().encodedQuery
+            val url = "${params.first()}/${store.id}"
 
-            return getRequest(params.first(), "POST", parameters)
+            return getRequest(url, "DELETE", null, true)
         }
 
         override fun onPostExecute(jsonStr: String) {
             super.onPostExecute(jsonStr)
 
             try {
-                if (jsonStr.equals("true")) {
-                    loadAllItemsFromStore(delegate)
-                }
-                else {
-                    Log.d("Error!", "Operação de atualização falhou!!!")
-                    delegate.setStatus(false)
-                }
+                loadAllItemsFromStore(delegate)
+                delegate.setStatus(true)
             }
             catch (e: Exception) {
                 Log.d("Error!", "JSON error: ${e.localizedMessage}")
@@ -254,7 +261,7 @@ object DataStore {
 
     class TaskLoadAllProducts(var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
         override fun doInBackground(vararg params: String): String {
-            return getRequest(params.first(), "GET", null)
+            return getRequest(params.first(), "GET", null, true)
         }
 
         override fun onPostExecute(jsonStr: String) {
@@ -278,6 +285,66 @@ object DataStore {
                 }
 
                 delegate.setStatus(true)
+            }
+            catch (e: Exception) {
+                Log.d("Error!", "JSON error: ${e.localizedMessage}")
+                delegate.setStatus(false)
+            }
+        }
+    }
+
+    class TaskAddUser(var user: User, var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
+        override fun doInBackground(vararg params: String): String {
+            val parameters = JSONObject()
+            parameters.put("name", user.name)
+            parameters.put("email", user.email)
+            parameters.put("password", user.password)
+
+            return getRequest(params.first(), "POST", parameters, false)
+        }
+
+        override fun onPostExecute(jsonStr: String) {
+            super.onPostExecute(jsonStr)
+
+            try {
+                val user = JSONObject(jsonStr)
+                val id = user.getInt("id")
+                if(id != null){
+                    delegate.setStatus(true)
+                }
+                else{
+                    delegate.setStatus(false)
+                }
+            }
+            catch (e: Exception) {
+                Log.d("Error!", "JSON error: ${e.localizedMessage}")
+                delegate.setStatus(false)
+            }
+        }
+    }
+
+    class TaskLoginUser(var user: User, var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
+        override fun doInBackground(vararg params: String): String {
+            val parameters = JSONObject()
+            parameters.put("email", user.email)
+            parameters.put("password", user.password)
+
+            return getRequest(params.first(), "POST", parameters, true)
+        }
+
+        override fun onPostExecute(jsonStr: String) {
+            super.onPostExecute(jsonStr)
+
+            try {
+                val user = JSONObject(jsonStr)
+                val responseAccessToken = user.getString("accessToken")
+                if(responseAccessToken != null && responseAccessToken.isNotEmpty()){
+                    accessToken = responseAccessToken
+                    delegate.setStatus(true)
+                }
+                else{
+                    delegate.setStatus(false)
+                }
             }
             catch (e: Exception) {
                 Log.d("Error!", "JSON error: ${e.localizedMessage}")
