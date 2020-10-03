@@ -11,4 +11,7 @@
     <string name="password">Senha</string>
     <string name="remember">Lembrar</string>
     <string name="signin">Entrar</string>
+
+    <string name="PACK">Unidade</string>
+    <string name="WEIGHT">Peso</string>
 </resources>

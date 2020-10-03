@@ -20,17 +20,31 @@ object DataStore {
     var password = "123456"
         private set
 
-    val baseUrl = "http://192.168.0.115:4001"
+    val baseUrl = "http://gonzagahouse.ddns-intelbrs.com.br:600/"
+
+    var accessToken: String = ""
 
     private lateinit var myContext: Context
 
 
     fun setContext(context: Context) {
         myContext = context
+        setUnitMeasurements()
     }
 
     var stores: MutableList<Store> = arrayListOf()
         private set
+
+    var unitMeasurements: MutableList<UnitMeasurementEnum> = arrayListOf()
+        private set
+
+    var products: MutableList<Product> = arrayListOf()
+        private set
+
+    fun setUnitMeasurements() {
+        unitMeasurements.add(UnitMeasurementEnum.WEIGHT)
+        unitMeasurements.add(UnitMeasurementEnum.PACK)
+    }
 
     fun loadAllItemsFromStore(delegate: LoadReceiverDelegate) {
         TaskLoadStores(delegate).execute("$baseUrl/Store/list")
@@ -42,20 +56,34 @@ object DataStore {
 
     fun addItemToStore(city: Store, delegate: LoadReceiverDelegate) {
         TaskAddStore(city, delegate).execute("$baseUrl/Store")
-//        cities.add(city)
     }
 
     fun editItemFromStore(city: Store, position: Int, delegate: LoadReceiverDelegate) {
-        TaskEditStore(city, delegate).execute("$baseUrl/Store")
-//        cities.set(position, city)
+        TaskEditStore(city, delegate).execute("$baseUrl/Store/teste")
     }
 
     fun removeItemFromStore(position: Int, delegate: LoadReceiverDelegate) {
-        TaskRemoveStore(getItemFromStore(position), delegate).execute("$baseUrl/Store/")
+        TaskRemoveStore(getItemFromStore(position), delegate).execute("$baseUrl/Store/delete")
     }
 
     fun clearAllItemsFromStore() {
         stores.clear()
+    }
+
+    fun loadAllProducts(delegate: LoadReceiverDelegate) {
+        TaskLoadAllProducts(delegate).execute("$baseUrl/Product/list")
+    }
+
+    fun getProduct(position: Int): Product {
+        return products.get(position)
+    }
+
+    fun getProductById(id: Int): Product? {
+        return products.firstOrNull { it.id == id }
+    }
+
+    fun clearAllProducts() {
+        products.clear()
     }
 
     fun getRequest(endPoint: String, method: String, parameter: String?): String {
@@ -66,11 +94,12 @@ object DataStore {
 
         connection.requestMethod = method
 
-        connection.readTimeout = 5000
-        connection.connectTimeout = 5000
+        connection.readTimeout = 50000000
+        connection.connectTimeout = 500000000
+        connection.setRequestProperty("Authorization", "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyIiwidXNlck5hbWUiOiJTdGhlZmFubnkiLCJuYmYiOjE2MDE2Nzk0MzksImV4cCI6MTYwNDI3MTQzOSwiaWF0IjoxNjAxNjc5NDM5LCJpc3MiOiJTdG9yZVJvb20iLCJhdWQiOiJFdmVyeW9uZSJ9.EYA0m_G9HexLwh0S0WxeKzwkN2pCY0i08fbsakeNjZEK30LVSAkePMCTfS3W0fvyinJF4zAtWB-D2f1xQmJhhA");
 
         connection.doInput = true
-        if (method.equals("POST")) {
+        if (method.equals("POST") || method.equals("PUT")) {
             connection.doOutput = true
         }
 
@@ -185,28 +214,18 @@ object DataStore {
             val builder = Uri.Builder()
             builder.appendQueryParameter("id", store.id.toString())
             builder.appendQueryParameter("productId", store.productId.toString())
-            builder.appendQueryParameter("product", store.productName)
             builder.appendQueryParameter("quantity", store.quantity.toString())
             builder.appendQueryParameter("unitMea", store.unitMeasurement.toString())
             val parameters = builder.build().encodedQuery
 
-            return getRequest(params.first(), "PUT", parameters)
+            return getRequest(params.first(), "POST", parameters)
         }
 
         override fun onPostExecute(jsonStr: String) {
             super.onPostExecute(jsonStr)
 
             try {
-                val json = JSONObject(jsonStr)
-                val result = json.getString("resultCode")
-
-                if (result.equals("codeOk")) {
-                    delegate.setStatus(true)
-                }
-                else {
-                    Log.d("Error!", "Operação de atualização falhou!!!")
-                    delegate.setStatus(false)
-                }
+                loadAllItemsFromStore(delegate)
             }
             catch (e: Exception) {
                 Log.d("Error!", "JSON error: ${e.localizedMessage}")
@@ -221,23 +240,54 @@ object DataStore {
             builder.appendQueryParameter("id", store.id.toString())
             val parameters = builder.build().encodedQuery
 
-            return getRequest(params.first(), "DELETE", parameters)
+            return getRequest(params.first(), "POST", parameters)
         }
 
         override fun onPostExecute(jsonStr: String) {
             super.onPostExecute(jsonStr)
 
             try {
-                val json = JSONObject(jsonStr)
-                val result = json.getString("resultCode")
-
-                if (result.equals("codeOk")) {
+                if (jsonStr.equals("true")) {
                     loadAllItemsFromStore(delegate)
                 }
                 else {
                     Log.d("Error!", "Operação de atualização falhou!!!")
                     delegate.setStatus(false)
                 }
+            }
+            catch (e: Exception) {
+                Log.d("Error!", "JSON error: ${e.localizedMessage}")
+                delegate.setStatus(false)
+            }
+        }
+    }
+
+    class TaskLoadAllProducts(var delegate: LoadReceiverDelegate): AsyncTask<String, Void, String>() {
+        override fun doInBackground(vararg params: String): String {
+            return getRequest(params.first(), "GET", null)
+        }
+
+        override fun onPostExecute(jsonStr: String) {
+            super.onPostExecute(jsonStr)
+
+            try {
+                val storesArray = JSONArray(jsonStr)
+
+                products.clear()
+
+                for (i in 0 until storesArray.length()) {
+                    val store = storesArray[i] as JSONObject
+
+                    val productId = store.getInt("id")
+                    val productName = store.getString("name")
+
+                    val newProduct = Product(productName)
+                    newProduct.id = productId
+
+                    products.add(newProduct)
+                }
+
+                delegate.setStatus(true)
             }
             catch (e: Exception) {
                 Log.d("Error!", "JSON error: ${e.localizedMessage}")

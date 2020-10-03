@@ -33,6 +33,8 @@ class MainActivity : AppCompatActivity(), LoadReceiverDelegate {
 
         DataStore.loadAllItemsFromStore(this)
 
+        DataStore.loadAllProducts(this)
+
         fab.setOnClickListener {
             val intent = Intent(this@MainActivity, ManagerStoreActivity::class.java).apply {
                 putExtra("type", 1)
@@ -57,7 +59,7 @@ class MainActivity : AppCompatActivity(), LoadReceiverDelegate {
                     view?.let {
 
                         val position = rcvStores.getChildAdapterPosition(view)
-                        val city = DataStore.getItemFromStore(position)
+                        val store = DataStore.getItemFromStore(position)
 
                         val intent = Intent(this@MainActivity, ManagerStoreActivity::class.java).apply {
                             putExtra("type", 2)
