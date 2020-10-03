@@ -42,23 +42,42 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Produto: "
+                    android:text="Escolher Produto: "
                     android:textStyle="bold"/>
 
                 <Spinner
                     android:id="@+id/spnProducts"
-                    android:layout_width="250dp"
+                    android:layout_width="fill_parent"
                     android:layout_height="50dp"
                     android:layout_marginBottom="20dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:theme="@style/AppTheme.EditText"/>
 
-                <ImageButton
-                    android:layout_width="50dp"
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Adicionar Produto: "
+                    android:textStyle="bold"/>
+
+                <EditText
+                    android:id="@+id/txtProduct"
+                    android:layout_width="fill_parent"
                     android:layout_height="50dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/plus_solid" />
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:hint="Nome do Produto"
+                    android:theme="@style/AppTheme.EditText"
+                    android:background="@drawable/ui_input_component"/>
 
             </LinearLayout>
 
@@ -81,7 +100,7 @@
                     android:layout_marginBottom="20dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:hint="0"
+                    android:text="0"
                     android:inputType="numberSigned"
                     android:theme="@style/AppTheme.EditText"
                     android:background="@drawable/ui_input_component"/>

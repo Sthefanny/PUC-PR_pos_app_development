@@ -145,6 +145,7 @@ class MainActivity : AppCompatActivity(), LoadReceiverDelegate {
                 adapter!!.notifyDataSetChanged()
                 updateCollapsinTitle()
                 DataStore.loadAllItemsFromStore(this)
+                DataStore.loadAllProducts(this)
             }
         }
 
@@ -155,6 +156,7 @@ class MainActivity : AppCompatActivity(), LoadReceiverDelegate {
                 Snackbar.make(layMain, "Produto alterado: ${name}", Snackbar.LENGTH_LONG).show()
                 adapter!!.notifyDataSetChanged()
                 DataStore.loadAllItemsFromStore(this)
+                DataStore.loadAllProducts(this)
             }
         }
     }

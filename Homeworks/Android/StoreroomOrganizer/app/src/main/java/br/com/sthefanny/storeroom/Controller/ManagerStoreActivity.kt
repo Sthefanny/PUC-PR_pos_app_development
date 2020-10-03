@@ -1,7 +1,6 @@
 package br.com.sthefanny.storeroom.Controller
 
 import android.content.Intent
-import android.content.res.Resources
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,9 +11,10 @@ import br.com.sthefanny.storeroom.Controller.Interfaces.LoadReceiverDelegate
 import br.com.sthefanny.storeroom.Model.DataStore
 import br.com.sthefanny.storeroom.Model.Product
 import br.com.sthefanny.storeroom.Model.Store
-import br.com.sthefanny.storeroom.Model.UnitMeasurementEnum
+import br.com.sthefanny.storeroom.Model.UnitMeasurement
 import br.com.sthefanny.storeroom.R
 import kotlinx.android.synthetic.main.activity_manager_store.*
+import kotlinx.android.synthetic.main.activity_manager_store.txtQuantity
 
 
 class ManagerStoreActivity : AppCompatActivity(), LoadReceiverDelegate {
@@ -31,25 +31,25 @@ class ManagerStoreActivity : AppCompatActivity(), LoadReceiverDelegate {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Gerenciar Itens na Dispensa"
 
-        val res: Resources = resources
-        val weight: UnitMeasurementEnum = UnitMeasurementEnum.WEIGHT
-        val pack: UnitMeasurementEnum = UnitMeasurementEnum.PACK
-        val weightLocalized = res.getString(res.getIdentifier(weight.name, "string", packageName))
-        val packLocalized = res.getString(res.getIdentifier(pack.name, "string", packageName))
+//        val res: Resources = resources
+//        val weight: UnitMeasurementEnum = UnitMeasurementEnum.WEIGHT
+//        val pack: UnitMeasurementEnum = UnitMeasurementEnum.PACK
+//        val weightLocalized = res.getString(res.getIdentifier(weight.name, "string", packageName))
+//        val packLocalized = res.getString(res.getIdentifier(pack.name, "string", packageName))
 
-        var listUnit: MutableList<String> = arrayListOf()
-        listUnit.add(weightLocalized)
-        listUnit.add(packLocalized)
+//        var listUnit: MutableList<UnitMeasurementEnum> = arrayListOf()
 
         var adapterUnit = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_item,
-            listUnit
+            DataStore.unitMeasurements
         )
         adapterUnit.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         spnUnitMeasurement.adapter = adapterUnit
         spnUnitMeasurement.setSelection(0, false)
+
+        DataStore.products.add(0, Product("Escolha ou crie um novo"))
 
         adapterProducts = ArrayAdapter(
             this,
@@ -116,7 +116,19 @@ class ManagerStoreActivity : AppCompatActivity(), LoadReceiverDelegate {
         when(store.itemId) {
             R.id.mnuSave -> {
 
-                val store = Store(0, "", txtQuantity.text.toString().toInt(), 1)
+                val product: Product = spnProducts.getSelectedItem() as Product
+                val unitMea: UnitMeasurement = spnUnitMeasurement.getSelectedItem() as UnitMeasurement
+                var productId: Int = 0
+
+                val unitMeasurement = unitMea.id
+
+                if (product.id > 0) {
+                    productId = product.id
+                }
+
+                val productName = txtProduct.text.toString()
+
+                val store = Store(productId, productName, txtQuantity.text.toString().toInt(), unitMeasurement)
                 name = store.productName
 
                 if (type == 1) {
@@ -126,8 +138,10 @@ class ManagerStoreActivity : AppCompatActivity(), LoadReceiverDelegate {
                     store.id = DataStore.getItemFromStore(position).id
 
                     val product: Product = spnProducts.getSelectedItem() as Product
+                    val unitMea: UnitMeasurement = spnUnitMeasurement.getSelectedItem() as UnitMeasurement
 
                     store.productId = product.id
+                    store.unitMeasurement = unitMea.id
 
                     DataStore.editItemFromStore(store, position, this)
                 }

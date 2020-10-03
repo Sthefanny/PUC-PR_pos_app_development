@@ -20,7 +20,7 @@ object DataStore {
     var password = "123456"
         private set
 
-    val baseUrl = "http://gonzagahouse.ddns-intelbrs.com.br:600/"
+    val baseUrl = "http://gonzagahouse.ddns-intelbrs.com.br:600"
 
     var accessToken: String = ""
 
@@ -35,15 +35,15 @@ object DataStore {
     var stores: MutableList<Store> = arrayListOf()
         private set
 
-    var unitMeasurements: MutableList<UnitMeasurementEnum> = arrayListOf()
+    var unitMeasurements: MutableList<UnitMeasurement> = arrayListOf()
         private set
 
     var products: MutableList<Product> = arrayListOf()
         private set
 
     fun setUnitMeasurements() {
-        unitMeasurements.add(UnitMeasurementEnum.WEIGHT)
-        unitMeasurements.add(UnitMeasurementEnum.PACK)
+        unitMeasurements.add(UnitMeasurement(0, "Peso"))
+        unitMeasurements.add(UnitMeasurement(1, "Unidade"))
     }
 
     fun loadAllItemsFromStore(delegate: LoadReceiverDelegate) {
@@ -190,17 +190,7 @@ object DataStore {
             super.onPostExecute(jsonStr)
 
             try {
-                val json = JSONObject(jsonStr)
-                val result = json.getString("resultCode")
-
-                if (result.equals("codeOk")) {
-                    store.id = json.getInt("id")
-                    delegate.setStatus(true)
-                }
-                else {
-                    Log.d("Error!", "Operação de inserção falhou!!!")
-                    delegate.setStatus(false)
-                }
+                delegate.setStatus(true)
             }
             catch (e: Exception) {
                 Log.d("Error!", "JSON error: ${e.localizedMessage}")
