@@ -17,23 +17,31 @@
         android:orientation="horizontal"
         android:layout_margin="10dp">
 
+        <ImageView
+            android:id="@+id/imvImageUrl"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
         <TextView
             android:id="@+id/txtProductName"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Tomate"/>
 
         <TextView
             android:id="@+id/txtQuantity"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:text="10"/>
 
         <TextView
             android:id="@+id/txtUnitMeasurement"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="unidades"/>

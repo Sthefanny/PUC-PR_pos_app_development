@@ -1,19 +1,23 @@
 package br.com.sthefanny.storeroom.Controller
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import br.com.sthefanny.storeroom.Controller.Interfaces.LoadReceiverDelegate
 import br.com.sthefanny.storeroom.Model.DataStore
+import br.com.sthefanny.storeroom.Model.ResponseModel
 import br.com.sthefanny.storeroom.Model.User
 import br.com.sthefanny.storeroom.R
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_main.*
 
-class LoginActivity : AppCompatActivity(), LoadReceiverDelegate {
+class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -47,8 +51,8 @@ class LoginActivity : AppCompatActivity(), LoadReceiverDelegate {
         val password = txtPassword.text.toString()
 
         if (login.isNotEmpty() && password.isNotEmpty()) {
-            val user = User("", login, password)
-            DataStore.loginUser(user, this)
+            val user = User("", login, password, null)
+            DataStore.loginUser(user){responseModel -> handleLogin(responseModel)}
         } else {
             val dialog = AlertDialog.Builder(this)
             dialog.setTitle("Erro")
@@ -79,18 +83,34 @@ class LoginActivity : AppCompatActivity(), LoadReceiverDelegate {
         }
     }
 
-    override fun setStatus(status: Boolean) {
-        if (status) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        var name = ""
+        data?.let {
+
+            name = data.getStringExtra("name").toString()
+        } ?: run {
+
+            name = "Erro de nome"
+        }
+
+        if (resultCode == Activity.RESULT_OK) {
+
+            Snackbar.make(layLogin, "Usuário criado: ${name}", Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    private fun handleLogin(responseModel: ResponseModel) {
+        if (responseModel.hasError != null && responseModel.hasError!!) {
+            Toast.makeText(this, responseModel.error, Toast.LENGTH_SHORT).show()
+        }
+        else if (responseModel.hasSuccess != null && responseModel.hasSuccess!!) {
             savePrefs()
 
             val mainIntent = Intent(this, MainActivity::class.java)
             startActivity(mainIntent)
             finish()
         }
-        else {
-            setResult(RESULT_CANCELED)
-        }
-
-        finish()
     }
 }
