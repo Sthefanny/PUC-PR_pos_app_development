@@ -6,17 +6,20 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.GestureDetector
+import android.view.Menu
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import br.com.sthefanny.storeroom.Model.DataStore
-import br.com.sthefanny.storeroom.Model.ResponseModel
+import br.com.sthefanny.storeroom.Model.*
 import br.com.sthefanny.storeroom.R
 import br.com.sthefanny.storeroom.View.StoreAdapter
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.toolbar
+import kotlinx.android.synthetic.main.activity_manager_store.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -110,6 +113,13 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+
+        menuInflater.inflate(R.menu.menu_manager_list, menu)
+
+        return true
+    }
+
     fun updateCollapsinTitle() {
 
         collapsingToolbar.title = "${getString(R.string.collapsinTitle)} (${DataStore.stores.size})"
@@ -149,6 +159,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onOptionsItemSelected(store: MenuItem): Boolean {
+
+        when(store.itemId) {
+            R.id.mnuLogout -> {
+                val dialog = AlertDialog.Builder(this@MainActivity)
+                dialog.setTitle("Organizador de Despensa")
+                dialog.setMessage("Tem certeza que deseja deslogar do aplicativo?")
+                dialog.setPositiveButton("Deslogar", DialogInterface.OnClickListener { dialog, which ->
+                    DataStore.logoutUser {responseModel -> handleLogout(responseModel)}
+                })
+                dialog.setNegativeButton("Cancelar", null)
+                dialog.show()
+            }
+            android.R.id.home -> {
+                finish()
+            }
+        }
+
+        return super.onOptionsItemSelected(store)
+    }
+
     private fun handleResult(responseModel: ResponseModel) {
         if (responseModel.hasError != null && responseModel.hasError!!) {
             Toast.makeText(this, responseModel.error, Toast.LENGTH_SHORT).show()
@@ -182,6 +213,17 @@ class MainActivity : AppCompatActivity() {
             updateCollapsinTitle()
 
             DataStore.loadAllItemsFromStore{responseModel -> handleStoreResult(responseModel)}
+        }
+    }
+
+    private fun handleLogout(responseModel: ResponseModel) {
+        if (responseModel.hasError != null && responseModel.hasError!!) {
+            Toast.makeText(this, responseModel.error, Toast.LENGTH_SHORT).show()
+        }
+        else if (responseModel.hasSuccess != null && responseModel.hasSuccess!!) {
+            val intent = Intent(this@MainActivity, LoginActivity::class.java)
+            finish()
+            startActivity(intent)
         }
     }
 

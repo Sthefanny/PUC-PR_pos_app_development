@@ -116,7 +116,6 @@ class ManagerStoreActivity : AppCompatActivity() {
 
         when(store.itemId) {
             R.id.mnuSave -> {
-                imageAdded = false
                 val product: Product = spnProducts.getSelectedItem() as Product
                 val unitMea: UnitMeasurement = spnUnitMeasurement.getSelectedItem() as UnitMeasurement
                 var productId: Int = 0
