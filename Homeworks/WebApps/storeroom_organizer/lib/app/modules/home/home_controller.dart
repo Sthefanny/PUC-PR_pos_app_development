@@ -6,12 +6,4 @@ part 'home_controller.g.dart';
 @Injectable()
 class HomeController = _HomeControllerBase with _$HomeController;
 
-abstract class _HomeControllerBase with Store {
-  @observable
-  int value = 0;
-
-  @action
-  void increment() {
-    value++;
-  }
-}
+abstract class _HomeControllerBase with Store {}
