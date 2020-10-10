@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_modular/flutter_modular.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../shared/configs/colors_config.dart';
 import '../../../shared/widgets/text_field_default.dart';
+import '../login_controller.dart';
 
 class SignUp extends StatefulWidget {
   @override
   _SignUpState createState() => _SignUpState();
 }
 
-class _SignUpState extends State<SignUp> {
+class _SignUpState extends ModularState<SignUp, LoginController> {
   final _focusName = FocusNode();
   final _focusLogin = FocusNode();
   final _focusPassword = FocusNode();
@@ -21,7 +25,8 @@ class _SignUpState extends State<SignUp> {
 
     return Container(
       padding: EdgeInsets.only(top: 23),
-      child: Column(
+      child: ListView(
+        padding: const EdgeInsets.all(0),
         children: <Widget>[
           Stack(
             alignment: Alignment.topCenter,
@@ -62,10 +67,10 @@ class _SignUpState extends State<SignUp> {
         cursorColor: ColorsConfig.loginGradientStart,
         hintText: 'Nome',
         onChanged: (teste) {},
-        onEditingComplete: () => FocusScope.of(context).requestFocus(_focusPassword),
         keyboardType: TextInputType.text,
         focusNode: _focusName,
         textInputAction: TextInputAction.next,
+        onEditingComplete: () => FocusScope.of(context).requestFocus(_focusLogin),
       ),
     );
   }
@@ -77,24 +82,33 @@ class _SignUpState extends State<SignUp> {
         cursorColor: ColorsConfig.loginGradientStart,
         hintText: 'Email',
         onChanged: (teste) {},
-        onEditingComplete: () => FocusScope.of(context).requestFocus(_focusPassword),
         keyboardType: TextInputType.text,
         focusNode: _focusLogin,
         textInputAction: TextInputAction.next,
+        onEditingComplete: () => FocusScope.of(context).requestFocus(_focusPassword),
       ),
     );
   }
 
   Widget passwordField() {
     return Container(
-      child: TextFieldWidget(
-        cursorColor: ColorsConfig.loginGradientStart,
-        hintText: 'Senha',
-        onChanged: (teste) {},
-        onEditingComplete: () => FocusScope.of(context).requestFocus(_focusPassword),
-        keyboardType: TextInputType.text,
-        focusNode: _focusPassword,
-        textInputAction: TextInputAction.next,
+      child: Observer(
+        builder: (_) {
+          return TextFieldWidget(
+            cursorColor: ColorsConfig.loginGradientStart,
+            hintText: 'Senha',
+            obscureText: controller.signupObscurePass,
+            suffixIcon: IconButton(
+              icon: FaIcon(controller.signupObscurePass ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash, size: 18, color: ColorsConfig.textColor),
+              onPressed: controller.toggleSignupObscurePass,
+            ),
+            onChanged: (teste) {},
+            keyboardType: TextInputType.text,
+            focusNode: _focusPassword,
+            textInputAction: TextInputAction.next,
+            onEditingComplete: () => FocusScope.of(context).requestFocus(_focusConfirmPass),
+          );
+        },
       ),
     );
   }
@@ -102,14 +116,23 @@ class _SignUpState extends State<SignUp> {
   Widget confirmPassField() {
     return Container(
       margin: const EdgeInsets.only(top: 10),
-      child: TextFieldWidget(
-        cursorColor: ColorsConfig.loginGradientStart,
-        hintText: 'Confirmação de senha',
-        onChanged: (teste) {},
-        onEditingComplete: () => FocusScope.of(context).requestFocus(_focusPassword),
-        keyboardType: TextInputType.text,
-        focusNode: _focusConfirmPass,
-        textInputAction: TextInputAction.next,
+      child: Observer(
+        builder: (_) {
+          return TextFieldWidget(
+            cursorColor: ColorsConfig.loginGradientStart,
+            hintText: 'Confirmação de senha',
+            obscureText: controller.signupObscureConfirmPass,
+            suffixIcon: IconButton(
+              icon: FaIcon(controller.signupObscureConfirmPass ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash, size: 18, color: ColorsConfig.textColor),
+              onPressed: controller.toggleSignupObscureConfirmPass,
+            ),
+            onChanged: (teste) {},
+            keyboardType: TextInputType.text,
+            focusNode: _focusConfirmPass,
+            textInputAction: TextInputAction.done,
+            onEditingComplete: () {},
+          );
+        },
       ),
     );
   }

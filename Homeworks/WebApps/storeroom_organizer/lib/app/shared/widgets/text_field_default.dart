@@ -44,6 +44,7 @@ class TextFieldWidget extends StatelessWidget {
         cursorColor: cursorColor,
         keyboardType: keyboardType ?? TextInputType.text,
         maxLines: maxLines ?? 1,
+        style: Theme.of(context).textTheme.bodyText1,
         decoration: _getInputDecoration(),
         inputFormatters: inputFormatters ?? [],
         focusNode: focusNode ?? null,

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:storeroom_organizer/app/shared/configs/colors_config.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import '../../../shared/configs/colors_config.dart';
 import '../../../shared/widgets/text_field_default.dart';
 import '../login_controller.dart';
 
@@ -20,8 +23,8 @@ class _SignInState extends ModularState<SignIn, LoginController> {
 
     return Container(
       padding: EdgeInsets.only(top: 23),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: ListView(
+        padding: const EdgeInsets.all(0),
         children: <Widget>[
           Stack(
             alignment: Alignment.topCenter,
@@ -59,7 +62,7 @@ class _SignInState extends ModularState<SignIn, LoginController> {
       child: TextFieldWidget(
         cursorColor: ColorsConfig.loginGradientStart,
         hintText: 'Email',
-        onChanged: (teste) {},
+        onChanged: controller.changeSigninLogin,
         onEditingComplete: () => FocusScope.of(context).requestFocus(_focusPassword),
         keyboardType: TextInputType.text,
         focusNode: _focusLogin,
@@ -70,14 +73,23 @@ class _SignInState extends ModularState<SignIn, LoginController> {
 
   Widget passwordField() {
     return Container(
-      child: TextFieldWidget(
-        cursorColor: ColorsConfig.loginGradientStart,
-        hintText: 'Senha',
-        onChanged: (teste) {},
-        keyboardType: TextInputType.text,
-        focusNode: _focusLogin,
-        textInputAction: TextInputAction.next,
-        onEditingComplete: () => FocusScope.of(context).requestFocus(_focusPassword),
+      child: Observer(
+        builder: (_) {
+          return TextFieldWidget(
+            cursorColor: ColorsConfig.loginGradientStart,
+            hintText: 'Senha',
+            obscureText: controller.signinObscurePass,
+            suffixIcon: IconButton(
+              icon: FaIcon(controller.signinObscurePass ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash, size: 18, color: ColorsConfig.textColor),
+              onPressed: controller.toggleSigninObscurePass,
+            ),
+            onChanged: controller.changeSigninPass,
+            keyboardType: TextInputType.text,
+            focusNode: _focusPassword,
+            textInputAction: TextInputAction.done,
+            onEditingComplete: () {},
+          );
+        },
       ),
     );
   }

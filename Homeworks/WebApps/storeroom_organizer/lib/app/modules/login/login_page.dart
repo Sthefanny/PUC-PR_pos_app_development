@@ -16,25 +16,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final FocusNode myFocusNodeEmailLogin = FocusNode();
-  final FocusNode myFocusNodePasswordLogin = FocusNode();
-
-  final FocusNode myFocusNodePassword = FocusNode();
-  final FocusNode myFocusNodeEmail = FocusNode();
-  final FocusNode myFocusNodeName = FocusNode();
-
-  TextEditingController loginEmailController = TextEditingController();
-  TextEditingController loginPasswordController = TextEditingController();
-
-  bool _obscureTextLogin = true;
-  bool _obscureTextSignup = true;
-  bool _obscureTextSignupConfirm = true;
-
-  TextEditingController signupEmailController = TextEditingController();
-  TextEditingController signupNameController = TextEditingController();
-  TextEditingController signupPasswordController = TextEditingController();
-  TextEditingController signupConfirmPasswordController = TextEditingController();
-
   PageController _pageController;
 
   Color left = Colors.black;
@@ -43,9 +24,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
   @override
   void dispose() {
-    myFocusNodePassword.dispose();
-    myFocusNodeEmail.dispose();
-    myFocusNodeName.dispose();
     _pageController?.dispose();
     super.dispose();
   }
@@ -126,14 +104,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         }
       },
       children: <Widget>[
-        ConstrainedBox(
-          constraints: const BoxConstraints.expand(),
-          child: SignIn(),
-        ),
-        ConstrainedBox(
-          constraints: const BoxConstraints.expand(),
-          child: SignUp(),
-        ),
+        SignIn(),
+        SignUp(),
       ],
     );
   }
@@ -188,24 +160,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     _pageController?.animateToPage(1, duration: Duration(milliseconds: 500), curve: Curves.decelerate);
   }
 
-  void _toggleLogin() {
-    setState(() {
-      _obscureTextLogin = !_obscureTextLogin;
-    });
-  }
-
-  void _toggleSignup() {
-    setState(() {
-      _obscureTextSignup = !_obscureTextSignup;
-    });
-  }
-
-  void _toggleSignupConfirm() {
-    setState(() {
-      _obscureTextSignupConfirm = !_obscureTextSignupConfirm;
-    });
-  }
-
   Widget _buildLogo() {
     return SafeArea(
       child: Container(
@@ -216,7 +170,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
               "assets/images/storeroom_logo.png",
               width: _logoWidth,
             ),
-            Text('Organizador de Despensa', style: themeData.textTheme.headline5),
+            Text('Organizador de Despensa', style: themeData.textTheme.headline5.merge(TextStyle(color: Colors.white))),
           ],
         ),
       ),

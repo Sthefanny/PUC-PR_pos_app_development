@@ -9,6 +9,7 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  font_awesome_flutter: ^8.10.0
   google_fonts: ^1.1.0
   dio: ^3.0.10
   flutter_mobx: ^1.1.0+2
@@ -37,5 +38,5 @@ vars:
     runner: flutter pub run build_runner
 scripts: 
     build: $runner build
-    watch: $clean & $get & $runner watch
+    watch: $clean & $get & $runner watch --delete-conflicting-outputs
     build_clean: $clean & $get & $runner build --delete-conflicting-outputs
