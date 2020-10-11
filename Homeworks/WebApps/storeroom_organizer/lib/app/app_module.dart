@@ -7,6 +7,7 @@ import 'app_widget.dart';
 import 'modules/home/home_module.dart';
 import 'modules/loading/loading_controller.dart';
 import 'modules/login/login_module.dart';
+import 'modules/splash/splash_module.dart';
 import 'shared/configs/dio_config.dart';
 import 'shared/repositories/secure_storage_repository.dart';
 import 'shared/rest_client.dart';
@@ -26,7 +27,8 @@ class AppModule extends MainModule {
 
   @override
   List<ModularRouter> get routers => [
-        ModularRouter(Modular.initialRoute, module: LoginModule()),
+        ModularRouter(Modular.initialRoute, module: SplashModule()),
+        ModularRouter('/login', module: LoginModule()),
         ModularRouter('/home', module: HomeModule()),
       ];
 
