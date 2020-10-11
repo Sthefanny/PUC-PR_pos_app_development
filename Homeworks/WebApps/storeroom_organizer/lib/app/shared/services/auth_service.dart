@@ -1,6 +1,7 @@
 import 'package:flutter_modular/flutter_modular.dart';
 
 import '../configs/dio_config.dart';
+import '../models/enums/config_enum.dart';
 import '../models/requests/create_user_request.dart';
 import '../models/requests/login_request.dart';
 import '../models/responses/login_response.dart';
@@ -18,7 +19,8 @@ class AuthService extends Disposable {
     var response = await _repository.login(request);
 
     if (response.accessToken != null) {
-      _tokenService.setItem('token', response.accessToken);
+      _tokenService.setItem(ConfigurationEnum.token.toStr, response.accessToken);
+      _tokenService.setItem(ConfigurationEnum.userName.toStr, response.name);
       _dio.addAuth();
     }
 

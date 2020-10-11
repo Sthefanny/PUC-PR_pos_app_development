@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import '../models/enums/config_enum.dart';
 
 import '../models/responses/error_response.dart';
 import '../repositories/secure_storage_repository.dart';
@@ -43,7 +44,7 @@ class DioConfig {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options) async {
-          var token = await _secureStorageRepository.getItem('token');
+          var token = await _secureStorageRepository.getItem(ConfigurationEnum.token.toStr);
           if (token != null && token.isNotEmpty) {
             print('Token: $token');
             options.headers.addAll({'Authorization': token});

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+
+import '../../shared/helpers/visual_identity_helper.dart';
+import '../loading/loading_widget.dart';
 import 'home_controller.dart';
+import 'widgets/user_header_widget.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
@@ -11,16 +16,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends ModularState<HomePage, HomeController> {
-  //use 'controller' variable to access controller
+  @override
+  void initState() {
+    super.initState();
+    controller.setUserName();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Column(
-        children: <Widget>[],
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        child: LoadingWidget(
+          child: Container(
+            decoration: VisualIdentityHelper.buildBackground(),
+            child: ListView(
+              children: [
+                Observer(builder: (_) {
+                  return UserHeaderWidget(userName: controller.userName);
+                }),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
