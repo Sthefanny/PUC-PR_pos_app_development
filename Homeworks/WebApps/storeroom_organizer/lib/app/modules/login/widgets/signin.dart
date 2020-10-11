@@ -4,7 +4,9 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../shared/configs/colors_config.dart';
+import '../../../shared/helpers/snackbar_messages_helper.dart';
 import '../../../shared/widgets/text_field_default.dart';
+import '../../loading/loading_controller.dart';
 import '../login_controller.dart';
 
 class SignIn extends StatefulWidget {
@@ -13,6 +15,7 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends ModularState<SignIn, LoginController> {
+  final LoadingController _loadingController = Modular.get();
   final _focusLogin = FocusNode();
   final _focusPassword = FocusNode();
   Size _size;
@@ -60,11 +63,12 @@ class _SignInState extends ModularState<SignIn, LoginController> {
   Widget loginField() {
     return Container(
       child: TextFieldWidget(
-        cursorColor: ColorsConfig.loginGradientStart,
+        cursorColor: ColorsConfig.purpleDark,
         hintText: 'Email',
         onChanged: controller.changeSigninLogin,
         onEditingComplete: () => FocusScope.of(context).requestFocus(_focusPassword),
         keyboardType: TextInputType.text,
+        textCapitalization: TextCapitalization.none,
         focusNode: _focusLogin,
         textInputAction: TextInputAction.next,
       ),
@@ -76,7 +80,7 @@ class _SignInState extends ModularState<SignIn, LoginController> {
       child: Observer(
         builder: (_) {
           return TextFieldWidget(
-            cursorColor: ColorsConfig.loginGradientStart,
+            cursorColor: ColorsConfig.purpleDark,
             hintText: 'Senha',
             obscureText: controller.signinObscurePass,
             suffixIcon: IconButton(
@@ -87,7 +91,7 @@ class _SignInState extends ModularState<SignIn, LoginController> {
             keyboardType: TextInputType.text,
             focusNode: _focusPassword,
             textInputAction: TextInputAction.done,
-            onEditingComplete: () {},
+            onEditingComplete: controller.canSignIn ? _signIn : null,
           );
         },
       ),
@@ -100,21 +104,38 @@ class _SignInState extends ModularState<SignIn, LoginController> {
         width: _size.width * 0.5,
         height: 50,
         margin: EdgeInsets.only(top: 205),
-        child: RaisedButton(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          color: ColorsConfig.button,
-          child: Text(
-            'Entrar'.toUpperCase(),
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          onPressed: () {
-            FocusScope.of(context).requestFocus(FocusNode());
-            print('teste');
-          },
-        ),
+        child: Observer(builder: (_) {
+          return RaisedButton(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            color: ColorsConfig.button,
+            disabledColor: ColorsConfig.disabledButton,
+            textColor: Colors.white,
+            disabledTextColor: Colors.grey,
+            child: Text(
+              'Entrar'.toUpperCase(),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            onPressed: controller.canSignIn ? _signIn : null,
+          );
+        }),
       ),
     );
+  }
+
+  void _signIn() {
+    FocusScope.of(context).requestFocus(FocusNode());
+    _loadingController.changeVisibility(true);
+
+    controller.submitSignIn().then((result) {
+      _loadingController.changeVisibility(false);
+      if (result) {
+        Modular.to.pushReplacementNamed('/home');
+      }
+    }).catchError((error) {
+      _loadingController.changeVisibility(false);
+      SnackbarMessages.showError(context: context, description: error);
+    }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 }

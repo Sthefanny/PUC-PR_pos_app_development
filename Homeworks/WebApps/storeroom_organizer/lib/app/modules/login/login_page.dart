@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_modular/flutter_modular.dart';
+import 'package:storeroom_organizer/app/modules/login/login_controller.dart';
 
 import '../../shared/configs/colors_config.dart';
 import '../../shared/configs/themes_config.dart';
+import '../loading/loading_widget.dart';
 import 'widgets/signin.dart';
 import 'widgets/signup.dart';
 import 'widgets/tab_indicator_painter.dart';
@@ -11,73 +15,42 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
-  Size _size;
-
+class _LoginPageState extends ModularState<LoginPage, LoginController> with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  PageController _pageController;
-
+  Size _size;
   Color left = Colors.black;
   Color right = Colors.white;
   double _logoWidth = 150;
 
   @override
-  void dispose() {
-    _pageController?.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    _pageController = PageController();
-  }
-
-  @override
   Widget build(BuildContext context) {
     _size = MediaQuery.of(context).size;
 
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
-      child: Scaffold(
-        key: _scaffoldKey,
-        body: NotificationListener<OverscrollIndicatorNotification>(
-          // onNotification: (overscroll) {
-          //   overscroll.disallowGlow();
-          // },
+    return Scaffold(
+      key: _scaffoldKey,
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        child: LoadingWidget(
           child: Stack(
             children: <Widget>[
               SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Stack(
-                      children: <Widget>[
-                        Container(
-                          width: _size.width,
-                          height: _size.height,
-                          decoration: buildBackground(),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              _buildLogo(),
-                              _buildMenuBar(),
-                              Expanded(
-                                flex: 2,
-                                child: _buildMenu(),
-                              ),
-                            ],
-                          ),
-                        ),
-                        // PolicyWidget(),
-                      ],
-                    ),
-                  ],
+                child: Container(
+                  width: _size.width,
+                  height: _size.height,
+                  decoration: buildBackground(),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      _buildLogo(),
+                      _buildMenuBar(),
+                      Expanded(
+                        flex: 2,
+                        child: _buildMenu(),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              // LoadingWidget(),
             ],
           ),
         ),
@@ -86,28 +59,30 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }
 
   Widget _buildMenu() {
-    return PageView(
-      controller: _pageController,
-      onPageChanged: (i) {
-        if (i == 0) {
-          setState(() {
-            right = Colors.white;
-            left = Colors.black;
-            _logoWidth = 150;
-          });
-        } else if (i == 1) {
-          setState(() {
-            right = Colors.black;
-            left = Colors.white;
-            _logoWidth = 100;
-          });
-        }
-      },
-      children: <Widget>[
-        SignIn(),
-        SignUp(),
-      ],
-    );
+    return Observer(builder: (_) {
+      return PageView(
+        controller: controller.pageController,
+        onPageChanged: (i) {
+          if (i == 0) {
+            setState(() {
+              right = Colors.white;
+              left = Colors.black;
+              _logoWidth = 150;
+            });
+          } else if (i == 1) {
+            setState(() {
+              right = Colors.black;
+              left = Colors.white;
+              _logoWidth = 100;
+            });
+          }
+        },
+        children: <Widget>[
+          SignIn(),
+          SignUp(),
+        ],
+      );
+    });
   }
 
   Widget _buildMenuBar() {
@@ -118,46 +93,44 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         color: ColorsConfig.menuBar,
         borderRadius: BorderRadius.all(Radius.circular(25)),
       ),
-      child: CustomPaint(
-        painter: TabIndicationPainter(pageController: _pageController),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Expanded(
-              child: FlatButton(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onPressed: _onSignInButtonPress,
-                child: Text(
-                  'Entrar',
-                  style: TextStyle(color: left, fontSize: 16),
+      child: Observer(
+        builder: (_) {
+          if (controller?.pageController == null) return const SizedBox();
+
+          return CustomPaint(
+            painter: TabIndicationPainter(pageController: controller.pageController),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Expanded(
+                  child: FlatButton(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onPressed: () => controller.changePageController(0),
+                    child: Text(
+                      'Entrar',
+                      style: TextStyle(color: left, fontSize: 16),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Expanded(
-              child: FlatButton(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onPressed: _onSignUpButtonPress,
-                child: Text(
-                  'Criar Conta',
-                  maxLines: 1,
-                  style: TextStyle(color: right, fontSize: 16),
+                Expanded(
+                  child: FlatButton(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onPressed: () => controller.changePageController(1),
+                    child: Text(
+                      'Criar Conta',
+                      maxLines: 1,
+                      style: TextStyle(color: right, fontSize: 16),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
-  }
-
-  void _onSignInButtonPress() {
-    _pageController.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.decelerate);
-  }
-
-  void _onSignUpButtonPress() {
-    _pageController?.animateToPage(1, duration: Duration(milliseconds: 500), curve: Curves.decelerate);
   }
 
   Widget _buildLogo() {
@@ -180,7 +153,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   BoxDecoration buildBackground() {
     var background = BoxDecoration(
       gradient: LinearGradient(
-        colors: [ColorsConfig.loginGradientStart, ColorsConfig.loginGradientEnd],
+        colors: [ColorsConfig.purpleDark, ColorsConfig.purpleLight],
         begin: const FractionalOffset(0, 0),
         end: const FractionalOffset(1, 1),
         stops: [0, 1],

@@ -8,7 +8,7 @@ class LoginModule extends ChildModule {
   @override
   List<Bind> get binds => [
         Bind((i) => LoginStore(), singleton: true),
-        Bind((i) => LoginController(i())),
+        Bind((i) => LoginController(i(), i())),
       ];
 
   @override

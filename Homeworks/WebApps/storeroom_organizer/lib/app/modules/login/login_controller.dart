@@ -1,6 +1,12 @@
-import 'package:mobx/mobx.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:mobx/mobx.dart';
 
+import '../../shared/configs/dio_config.dart';
+import '../../shared/extensions/string_extensions.dart';
+import '../../shared/models/requests/create_user_request.dart';
+import '../../shared/models/requests/login_request.dart';
+import '../../shared/services/auth_service.dart';
 import 'login_store.dart';
 
 part 'login_controller.g.dart';
@@ -10,8 +16,9 @@ class LoginController = _LoginControllerBase with _$LoginController;
 
 abstract class _LoginControllerBase with Store {
   final LoginStore _loginStore;
+  final AuthService _authService;
 
-  _LoginControllerBase(this._loginStore);
+  _LoginControllerBase(this._loginStore, this._authService);
 
   //begin Store replication
 
@@ -27,6 +34,8 @@ abstract class _LoginControllerBase with Store {
   String get signupPass => _loginStore.signupPass;
   @computed
   String get signupConfirmPass => _loginStore.signupConfirmPass;
+  @computed
+  PageController get pageController => _loginStore.pageController;
 
   @action
   changeSigninLogin(String value) => _loginStore.changeSigninLogin(value);
@@ -40,6 +49,8 @@ abstract class _LoginControllerBase with Store {
   changeSignupPass(String value) => _loginStore.changeSignupPass(value);
   @action
   changeSignupConfirmPass(String value) => _loginStore.changeSignupConfirmPass(value);
+  @action
+  changePageController(int value) => _loginStore.changePageController(value);
 
   //end Store replication
 
@@ -56,4 +67,39 @@ abstract class _LoginControllerBase with Store {
   toggleSignupObscurePass() => signupObscurePass = !signupObscurePass;
   @action
   toggleSignupObscureConfirmPass() => signupObscureConfirmPass = !signupObscureConfirmPass;
+
+  @computed
+  bool get canSignIn => signinLogin.isNotNullOrEmpty() && signinPass.isNotNullOrEmpty();
+
+  @computed
+  bool get isPassEqual => signupPass.isNotNullOrEmpty() && signupConfirmPass.isNotNullOrEmpty() && signupPass == signupConfirmPass;
+
+  @computed
+  bool get canSignUp => signupName.isNotNullOrEmpty() && signupLogin.isNotNullOrEmpty() && signupPass.isNotNullOrEmpty() && signupConfirmPass.isNotNullOrEmpty();
+
+  @action
+  Future<bool> submitSignIn() async {
+    if (canSignIn) {
+      var request = LoginRequest(email: signinLogin, password: signinPass);
+      var response;
+
+      await _authService.login(request).then((result) => response = result).catchError(DioConfig.handleError);
+
+      return response != null ? true : false;
+    }
+    return false;
+  }
+
+  @action
+  Future<bool> submitSignUp() async {
+    if (canSignUp) {
+      var request = CreateUserRequest(name: signupName, email: signupLogin, password: signupPass);
+      var response;
+
+      await _authService.createUser(request).then((result) => response = result).catchError(DioConfig.handleError);
+
+      return response != null ? true : false;
+    }
+    return false;
+  }
 }

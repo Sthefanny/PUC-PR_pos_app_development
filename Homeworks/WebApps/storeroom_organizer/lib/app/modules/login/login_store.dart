@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 part 'login_store.g.dart';
 
@@ -16,6 +17,8 @@ abstract class _LoginStoreBase with Store {
   String signupPass;
   @observable
   String signupConfirmPass;
+  @observable
+  PageController pageController = PageController();
 
   @action
   changeSigninLogin(String value) => signinLogin = value;
@@ -24,9 +27,13 @@ abstract class _LoginStoreBase with Store {
   @action
   changeSignupName(String value) => signupName = value;
   @action
-  changeSignupLogin(String value) => signinLogin = value;
+  changeSignupLogin(String value) => signupLogin = value;
   @action
   changeSignupPass(String value) => signupPass = value;
   @action
   changeSignupConfirmPass(String value) => signupConfirmPass = value;
+  @action
+  changePageController(int value) {
+    pageController?.animateToPage(value, duration: Duration(milliseconds: 500), curve: Curves.decelerate);
+  }
 }
