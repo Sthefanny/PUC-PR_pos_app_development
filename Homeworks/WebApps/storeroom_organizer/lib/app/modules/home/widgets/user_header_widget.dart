@@ -20,7 +20,7 @@ class UserHeaderWidget extends StatelessWidget {
     return InkWell(
       onTap: () => showMenuDialog(context),
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 40),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -56,7 +56,8 @@ class UserHeaderWidget extends StatelessWidget {
                     Modular.to.pop();
                     showLogoutDialog(context);
                   },
-                  child: Text('Sair', style: themeData.textTheme.button.merge(TextStyle(color: ColorsConfig.purpleDark))),
+                  color: ColorsConfig.button,
+                  child: Text('Sair', style: themeData.textTheme.button.merge(TextStyle(color: Colors.white))),
                 ),
               ],
             ),

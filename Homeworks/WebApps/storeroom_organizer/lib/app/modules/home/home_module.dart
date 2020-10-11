@@ -1,12 +1,14 @@
-import 'home_controller.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
+import '../../shared/services/store_service.dart';
+import 'home_controller.dart';
 import 'home_page.dart';
 
 class HomeModule extends ChildModule {
   @override
   List<Bind> get binds => [
-        $HomeController,
+        Bind((i) => StoreService(i()), singleton: true),
+        Bind((i) => HomeController(i(), i())),
       ];
 
   @override

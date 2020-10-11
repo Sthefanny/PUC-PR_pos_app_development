@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:storeroom_organizer/app/shared/configs/themes_config.dart';
+
+import '../helpers/form_helper.dart';
 
 class TextFieldWidget extends StatelessWidget {
   final Function onChanged;
@@ -15,6 +18,7 @@ class TextFieldWidget extends StatelessWidget {
   final TextInputAction textInputAction;
   final bool obscureText;
   final TextCapitalization textCapitalization;
+  final String initialValue;
 
   const TextFieldWidget({
     Key key,
@@ -31,6 +35,7 @@ class TextFieldWidget extends StatelessWidget {
     this.textInputAction,
     this.obscureText,
     this.textCapitalization,
+    this.initialValue,
   }) : super(key: key);
 
   @override
@@ -38,14 +43,15 @@ class TextFieldWidget extends StatelessWidget {
     return Material(
       elevation: 1,
       borderRadius: BorderRadius.circular(10),
-      child: TextField(
+      child: TextFormField(
+        initialValue: null,
         controller: textEditingController,
         onChanged: onChanged,
         cursorColor: cursorColor,
         keyboardType: keyboardType ?? TextInputType.text,
         maxLines: maxLines ?? 1,
-        style: Theme.of(context).textTheme.bodyText1,
-        decoration: _getInputDecoration(),
+        style: themeData.textTheme.bodyText1,
+        decoration: FormHelper.getInputDecoration(hintText: hintText, suffixIcon: suffixIcon),
         inputFormatters: inputFormatters ?? [],
         focusNode: focusNode ?? null,
         onEditingComplete: onEditingComplete ?? () {},
@@ -53,27 +59,6 @@ class TextFieldWidget extends StatelessWidget {
         obscureText: obscureText ?? false,
         textCapitalization: textCapitalization ?? TextCapitalization.sentences,
       ),
-    );
-  }
-
-  InputDecoration _getInputDecoration() {
-    return InputDecoration(
-      contentPadding: EdgeInsets.all(15),
-      filled: true,
-      fillColor: Colors.white,
-      enabledBorder: _getOutlineInputBorder(),
-      focusedBorder: _getOutlineInputBorder(),
-      errorBorder: _getOutlineInputBorder(),
-      focusedErrorBorder: _getOutlineInputBorder(),
-      hintText: hintText,
-      suffixIcon: suffixIcon ?? null,
-    );
-  }
-
-  OutlineInputBorder _getOutlineInputBorder() {
-    return OutlineInputBorder(
-      borderSide: BorderSide(color: Colors.black.withOpacity(.12), width: 1),
-      borderRadius: BorderRadius.circular(10),
     );
   }
 }

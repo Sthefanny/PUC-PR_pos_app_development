@@ -8,6 +8,7 @@ import 'modules/home/home_module.dart';
 import 'modules/loading/loading_controller.dart';
 import 'modules/login/login_module.dart';
 import 'modules/splash/splash_module.dart';
+import 'modules/store_add_edit/store_add_edit_module.dart';
 import 'shared/configs/dio_config.dart';
 import 'shared/repositories/secure_storage_repository.dart';
 import 'shared/rest_client.dart';
@@ -30,6 +31,7 @@ class AppModule extends MainModule {
         ModularRouter(Modular.initialRoute, module: SplashModule()),
         ModularRouter('/login', module: LoginModule()),
         ModularRouter('/home', module: HomeModule()),
+        ModularRouter('/storeAddEdit', module: StoreAddEditModule()),
       ];
 
   @override
