@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../shared/helpers/snackbar_messages_helper.dart';
+import '../loading/loading_controller.dart';
+import '../../shared/configs/themes_config.dart';
 
+import '../../shared/configs/urls_config.dart';
+import '../../shared/extensions/string_extensions.dart';
 import '../../shared/helpers/visual_identity_helper.dart';
 import '../../shared/models/responses/store_response.dart';
 import '../../shared/widgets/empty_list.dart';
@@ -19,14 +26,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends ModularState<HomePage, HomeController> {
+  final LoadingController _loadingController = Modular.get();
+  Size _size;
+
   @override
   void initState() {
     super.initState();
     controller.setUserName();
+    controller.getStoreItems();
   }
 
   @override
   Widget build(BuildContext context) {
+    _size = MediaQuery.of(context).size;
+
     return Scaffold(
       body: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
@@ -38,56 +51,141 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
                 Observer(builder: (_) {
                   return UserHeaderWidget(userName: controller.userName);
                 }),
-                buildStoreItemsList(),
+                Expanded(child: buildStoreItemsList()),
               ],
             ),
           ),
         ),
       ),
       floatingActionButton: _buildAddButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
   Widget buildStoreItemsList() {
     return RefreshIndicator(
       onRefresh: controller.getStoreItems,
-      child: FutureBuilder(
-        future: controller.getStoreItems(),
-        builder: (_, AsyncSnapshot<List<StoreResponse>> snapshot) {
-          if (!snapshot.hasData) return const SizedBox();
-
-          var list = snapshot.data;
-          if (list.isEmpty) {
+      child: Observer(
+        builder: (_) {
+          if (controller.storeList.isEmpty) {
             return EmptyList();
           }
-          return ListView.builder(
-            itemCount: list.length,
-            itemBuilder: (_, i) {
-              var item = list[i];
-              return buildItemCard(item);
-            },
+          return Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                child: Text('Dispensa', style: themeData.textTheme.headline5.merge(TextStyle(color: Colors.white))),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 50),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: controller.storeList.length,
+                  itemBuilder: (_, i) {
+                    var item = controller.storeList[i];
+                    return _buildSlidableCard(item);
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),
     );
   }
 
-  Widget buildItemCard(StoreResponse item) {
-    return Container(
-      child: Row(
-        children: [
-          Image.network(item.imageUrl),
-          Text(item.product),
-          Text(item.quantity.toString()),
-        ],
+  Widget _buildSlidableCard(StoreResponse item) {
+    return Slidable(
+      actionPane: SlidableDrawerActionPane(),
+      actionExtentRatio: 0.25,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        child: _buildItemCard(item),
+      ),
+      secondaryActions: <Widget>[
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: IconSlideAction(
+            caption: 'Deletar',
+            color: Colors.red,
+            iconWidget: FaIcon(FontAwesomeIcons.trash, color: Colors.white),
+            onTap: () => _deleteItem(item.id),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildItemCard(StoreResponse item) {
+    return InkWell(
+      onTap: () async {
+        await Modular.to.pushNamed('/storeAddEdit', arguments: {'storeId': item.id});
+
+        controller.getStoreItems();
+      },
+      child: Container(
+        width: _size.width,
+        child: Card(
+          color: Colors.white,
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildImage(item.imageUrl),
+                Expanded(child: Text(item.product, textAlign: TextAlign.center, style: themeData.textTheme.bodyText2)),
+                Text('${item.quantity.toString()} ${controller.getUnitMeaName(item.unitMea)}', style: themeData.textTheme.bodyText2),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 
+  Widget _buildImage(String imageUrl) {
+    return imageUrl.isNotNullOrEmpty()
+        ? Image.network(
+            '${UrlConfig.baseUrl}$imageUrl',
+            height: 80,
+            fit: BoxFit.cover,
+          )
+        : SvgPicture.asset(
+            'assets/images/add_item.svg',
+            height: 80,
+            fit: BoxFit.cover,
+          );
+  }
+
   Widget _buildAddButton() {
     return FloatingActionButton(
-      onPressed: () => Modular.to.pushNamed('/storeAddEdit'),
+      onPressed: () async {
+        await Modular.to.pushNamed('/storeAddEdit');
+
+        controller.getStoreItems();
+      },
       child: FaIcon(FontAwesomeIcons.plus),
     );
+  }
+
+  void _deleteItem(int storeId) {
+    FocusScope.of(context).requestFocus(FocusNode());
+
+    _loadingController.changeVisibility(true);
+
+    controller.deleteItem(storeId).then((result) {
+      _loadingController.changeVisibility(false);
+      if (result) {
+        controller.getStoreItems();
+        SnackbarMessages.showSuccess(context: context, description: 'Produto excluído da dispensa com sucesso!');
+      }
+    }).catchError((error) {
+      _loadingController.changeVisibility(false);
+      SnackbarMessages.showError(context: context, description: error);
+    }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 }

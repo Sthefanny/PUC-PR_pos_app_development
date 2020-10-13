@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart' hide Headers;
 import 'package:retrofit/retrofit.dart';
 
+import 'configs/urls_config.dart';
 import 'models/requests/create_user_request.dart';
 import 'models/requests/login_request.dart';
 import 'models/responses/login_response.dart';
@@ -11,7 +12,7 @@ import 'models/responses/store_response.dart';
 
 part 'rest_client.g.dart';
 
-@RestApi(baseUrl: 'http://gonzagahouse.ddns-intelbras.com.br:600')
+@RestApi(baseUrl: UrlConfig.baseUrl)
 abstract class RestClient {
   factory RestClient(Dio dio, {String baseUrl}) = _RestClient;
 

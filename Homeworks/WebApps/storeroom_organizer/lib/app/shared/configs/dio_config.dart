@@ -15,7 +15,7 @@ class DioConfig {
     switch (error.runtimeType) {
       case DioError:
         final res = (error as DioError).response;
-        if (res.statusCode == 401) {
+        if (res?.statusCode == 401) {
           Modular.to.popUntil((var route) {
             if (route.isFirst) {
               return true;

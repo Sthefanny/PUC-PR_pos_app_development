@@ -8,7 +8,7 @@ class StoreResponse {
   final int unitMea;
   final String product;
   final int productId;
-  final int quantity;
+  final double quantity;
   final String imageUrl;
 
   StoreResponse({
