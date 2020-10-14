@@ -16,7 +16,7 @@ Nessa versão, é possível:
 ![create_account](screenshots/create_account.png)
 ![empty_list](screenshots/empty_list.png)
 ![add_item](screenshots/add_item.png)
-![delete_item](screenshots/delete_item.png)
 ![item_list](screenshots/item_list.png)
+![delete_item](screenshots/delete_item.png)
 ![profile](screenshots/profile.png)
 ![exit](screenshots/exit.png)
