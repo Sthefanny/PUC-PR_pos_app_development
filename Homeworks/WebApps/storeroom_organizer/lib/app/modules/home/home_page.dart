@@ -67,6 +67,9 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
       onRefresh: controller.getStoreItems,
       child: Observer(
         builder: (_) {
+          if (controller.storeList == null) {
+            return Center(child: CircularProgressIndicator());
+          }
           if (controller.storeList.isEmpty) {
             return EmptyList();
           }
@@ -74,7 +77,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
             children: [
               Container(
                 margin: const EdgeInsets.only(bottom: 10),
-                child: Text('Dispensa', style: themeData.textTheme.headline5.merge(TextStyle(color: Colors.white))),
+                child: Text('Despensa', style: themeData.textTheme.headline5.merge(TextStyle(color: Colors.white))),
               ),
               Expanded(
                 child: ListView.builder(
@@ -181,7 +184,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
       _loadingController.changeVisibility(false);
       if (result) {
         controller.getStoreItems();
-        SnackbarMessages.showSuccess(context: context, description: 'Produto excluído da dispensa com sucesso!');
+        SnackbarMessages.showSuccess(context: context, description: 'Produto excluído da despensa com sucesso!');
       }
     }).catchError((error) {
       _loadingController.changeVisibility(false);

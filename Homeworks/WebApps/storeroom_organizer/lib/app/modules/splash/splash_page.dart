@@ -42,12 +42,7 @@ class _SplashPageState extends ModularState<SplashPage, SplashController> {
   Widget build(BuildContext context) {
     return Container(
       decoration: VisualIdentityHelper.buildBackground(),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          VisualIdentityHelper.buildLogo(logoWidth: 150),
-        ],
-      ),
+      child: Center(child: CircularProgressIndicator()),
     );
   }
 }

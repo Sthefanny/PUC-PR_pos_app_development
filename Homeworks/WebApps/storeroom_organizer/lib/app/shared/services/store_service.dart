@@ -17,7 +17,7 @@ class StoreService extends Disposable {
       return response;
     }
 
-    throw 'Ocorreu um erro ao tentar listar os itens da dispensa.';
+    throw 'Ocorreu um erro ao tentar listar os itens da despensa.';
   }
 
   Future<StoreResponse> getItemFromStore(int id) async {
@@ -27,7 +27,7 @@ class StoreService extends Disposable {
       return response;
     }
 
-    throw 'Ocorreu um erro ao tentar retornar o item da dispensa.';
+    throw 'Ocorreu um erro ao tentar retornar o item da despensa.';
   }
 
   Future<bool> deleteItemFromStore(int id) async {
@@ -47,7 +47,7 @@ class StoreService extends Disposable {
       return response;
     }
 
-    throw 'Ocorreu um erro ao tentar adicionar o item na dispensa.';
+    throw 'Ocorreu um erro ao tentar adicionar o item na despensa.';
   }
 
   Future<StoreResponse> editItemToStore(StoreResponse request) async {
@@ -57,7 +57,7 @@ class StoreService extends Disposable {
       return response;
     }
 
-    throw 'Ocorreu um erro ao tentar editar o item na dispensa.';
+    throw 'Ocorreu um erro ao tentar editar o item na despensa.';
   }
 
   Future<StoreResponse> addImageToItem(int id, File file) async {
@@ -67,7 +67,7 @@ class StoreService extends Disposable {
       return response;
     }
 
-    throw 'Ocorreu um erro ao tentar adicionar imagem ao item na dispensa.';
+    throw 'Ocorreu um erro ao tentar adicionar imagem ao item na despensa.';
   }
 
   @override

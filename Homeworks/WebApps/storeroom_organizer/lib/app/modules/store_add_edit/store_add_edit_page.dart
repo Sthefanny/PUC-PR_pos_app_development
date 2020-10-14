@@ -133,7 +133,7 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
             ),
           ),
           Text(
-            'Adicionar item na dispensa',
+            'Adicionar item na despensa',
             style: themeData.textTheme.headline5.merge(TextStyle(color: Colors.white)),
           ),
         ],
@@ -375,7 +375,7 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
       _loadingController.changeVisibility(false);
       if (result) {
         Modular.to.pop();
-        SnackbarMessages.showSuccess(context: context, description: 'Produto incluído na dispensa com sucesso!');
+        SnackbarMessages.showSuccess(context: context, description: 'Produto incluído na despensa com sucesso!');
       }
     }).catchError((error) {
       _loadingController.changeVisibility(false);

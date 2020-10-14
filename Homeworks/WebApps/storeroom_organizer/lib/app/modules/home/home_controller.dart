@@ -22,7 +22,7 @@ abstract class _HomeControllerBase with Store {
   @observable
   String userName = '';
   @observable
-  List<StoreResponse> storeList = ObservableList<StoreResponse>();
+  ObservableList<StoreResponse> storeList;
 
   @action
   Future<void> setUserName() async {
@@ -32,6 +32,7 @@ abstract class _HomeControllerBase with Store {
   Future<void> getStoreItems() async {
     try {
       var response = await _service.listAllItemsFromStore();
+      storeList = ObservableList<StoreResponse>();
       storeList.clear();
       storeList.addAll(response);
     } catch (e) {

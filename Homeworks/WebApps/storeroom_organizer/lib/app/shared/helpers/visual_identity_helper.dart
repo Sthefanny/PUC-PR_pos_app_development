@@ -19,17 +19,22 @@ class VisualIdentityHelper {
     return background;
   }
 
-  static Widget buildLogo({@required double logoWidth}) {
+  static Widget buildLogo({@required double logoWidth, double fontSize}) {
     return SafeArea(
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 40),
         child: Column(
           children: [
             Image.asset(
-              "assets/images/storeroom_logo.png",
+              'assets/images/storeroom_logo.png',
               width: logoWidth,
             ),
-            Text('Organizador de Despensa', style: themeData.textTheme.headline5.merge(TextStyle(color: Colors.white))),
+            Text(
+              fontSize == null ? 'Organizador de Despensa' : 'Organizador\nde Despensa',
+              style: themeData.textTheme.headline5.merge(
+                TextStyle(color: Colors.white, fontSize: fontSize ?? 24),
+              ),
+            ),
           ],
         ),
       ),

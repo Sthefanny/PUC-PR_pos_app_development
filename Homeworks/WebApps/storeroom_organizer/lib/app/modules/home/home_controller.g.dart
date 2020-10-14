@@ -37,13 +37,13 @@ mixin _$HomeController on _HomeControllerBase, Store {
   final _$storeListAtom = Atom(name: '_HomeControllerBase.storeList');
 
   @override
-  List<StoreResponse> get storeList {
+  ObservableList<StoreResponse> get storeList {
     _$storeListAtom.reportRead();
     return super.storeList;
   }
 
   @override
-  set storeList(List<StoreResponse> value) {
+  set storeList(ObservableList<StoreResponse> value) {
     _$storeListAtom.reportWrite(value, super.storeList, () {
       super.storeList = value;
     });
