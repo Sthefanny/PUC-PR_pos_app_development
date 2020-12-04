@@ -413,3 +413,5 @@ fabric.properties
 android/.idea/
 
 .idea/
+.scannerwork/
+tests.output

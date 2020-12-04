@@ -17,13 +17,13 @@ import 'shared/services/auth_service.dart';
 class AppModule extends MainModule {
   @override
   List<Bind> get binds => [
-        Bind((i) => Dio(), singleton: true),
-        Bind((i) => FlutterSecureStorage(), singleton: true),
-        Bind((i) => SecureStorageRepository(i()), singleton: true),
-        Bind((i) => DioConfig(i(), i()), singleton: true),
-        Bind((i) => RestClient(i()), singleton: true),
-        Bind((i) => AuthService(i(), i(), i()), singleton: true),
-        Bind((i) => LoadingController(), singleton: true),
+        Bind((i) => Dio()),
+        Bind((i) => FlutterSecureStorage()),
+        Bind((i) => SecureStorageRepository(i())),
+        Bind((i) => DioConfig(i(), i())),
+        Bind((i) => RestClient(i())),
+        Bind((i) => AuthService(i(), i(), i())),
+        Bind((i) => LoadingController()),
       ];
 
   @override

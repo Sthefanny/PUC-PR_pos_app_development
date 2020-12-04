@@ -155,6 +155,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
         ? Image.network(
             '${UrlConfig.baseUrl}$imageUrl',
             height: 80,
+            width: 100,
             fit: BoxFit.cover,
           )
         : SvgPicture.asset(
