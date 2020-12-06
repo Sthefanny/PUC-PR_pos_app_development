@@ -30,7 +30,7 @@ class EmptyList extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
       child: Text(
         'A lista está vazia.',
-        style: themeData.textTheme.headline5.merge(TextStyle(color: Colors.white)),
+        style: themeData.textTheme.headline5.merge(const TextStyle(color: Colors.white)),
         textAlign: TextAlign.center,
       ),
     );

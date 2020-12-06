@@ -16,11 +16,11 @@ class AuthService extends Disposable {
   AuthService(this._repository, this._tokenService, this._dio);
 
   Future<LoginResponse> login(LoginRequest request) async {
-    var response = await _repository.login(request);
+    final response = await _repository.login(request);
 
     if (response.accessToken != null) {
-      _tokenService.setItem(ConfigurationEnum.token.toStr, response.accessToken);
-      _tokenService.setItem(ConfigurationEnum.userName.toStr, response.name);
+      await _tokenService.setItem(ConfigurationEnum.token.toStr, response.accessToken);
+      await _tokenService.setItem(ConfigurationEnum.userName.toStr, response.name);
       _dio.addAuth();
     }
 
@@ -28,10 +28,10 @@ class AuthService extends Disposable {
   }
 
   Future<bool> logout() async {
-    var response = await _repository.logout();
+    final response = await _repository.logout();
 
     if (response.response.statusCode >= 200 && response.response.statusCode <= 300) {
-      _tokenService.deleteAll();
+      await _tokenService.deleteAll();
       return true;
     }
 
@@ -39,13 +39,13 @@ class AuthService extends Disposable {
   }
 
   Future<LoginResponse> createUser(CreateUserRequest request) async {
-    var response = await _repository.createUser(request);
+    final response = await _repository.createUser(request);
 
     if (response.id != null && response.id > 0) {
       return response;
     }
 
-    throw 'Ocorreu um erro ao tentar criar usuário.';
+    throw Exception('Ocorreu um erro ao tentar criar usuário.');
   }
 
   @override

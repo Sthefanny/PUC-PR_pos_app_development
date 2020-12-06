@@ -10,22 +10,20 @@ import 'package:mobx/mobx.dart';
 
 import '../../shared/configs/colors_config.dart';
 import '../../shared/configs/themes_config.dart';
+import '../../shared/extensions/string_extensions.dart';
 import '../../shared/helpers/snackbar_messages_helper.dart';
 import '../../shared/helpers/visual_identity_helper.dart';
-import '../../shared/models/responses/product_response.dart';
-import '../../shared/models/unit_mea_model.dart';
 import '../../shared/utils/permission_utils.dart';
 import '../../shared/widgets/dropdown_button_default.dart';
 import '../../shared/widgets/text_field_default.dart';
 import '../loading/loading_controller.dart';
 import '../loading/loading_widget.dart';
 import 'store_add_edit_controller.dart';
-import '../../shared/extensions/string_extensions.dart';
 
 class StoreAddEditPage extends StatefulWidget {
   final String title;
   final int storeId;
-  const StoreAddEditPage({Key key, this.title = "StoreAddEdit", this.storeId}) : super(key: key);
+  const StoreAddEditPage({Key key, this.title = 'StoreAddEdit', this.storeId}) : super(key: key);
 
   @override
   _StoreAddEditPageState createState() => _StoreAddEditPageState();
@@ -33,7 +31,7 @@ class StoreAddEditPage extends StatefulWidget {
 
 class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEditController> {
   final LoadingController _loadingController = Modular.get();
-  var _quantityEditingController = TextEditingController();
+  final _quantityEditingController = TextEditingController();
   ReactionDisposer _disposer;
   Size _size;
   final picker = ImagePicker();
@@ -42,8 +40,9 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
   void initState() {
     super.initState();
     _validateQuantityText();
-    controller.changeId(widget.storeId);
-    controller.init();
+    controller
+      ..changeId(widget.storeId)
+      ..init();
   }
 
   @override
@@ -56,8 +55,9 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
     _disposer = reaction(
       (_) => controller.quantity,
       (quantity) {
-        _quantityEditingController.text = quantity.toString();
-        _quantityEditingController.selection = TextSelection.fromPosition(TextPosition(offset: quantity.toString().length));
+        _quantityEditingController
+          ..text = quantity.toString()
+          ..selection = TextSelection.fromPosition(TextPosition(offset: quantity.toString().length));
       },
     );
   }
@@ -94,27 +94,25 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
   }
 
   Widget _buildHeader() {
-    return Container(
-      child: Column(
-        children: [
-          _buildTitle(),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 10),
-            child: Observer(
-              builder: (_) {
-                return controller.imagePicked != null
-                    ? Image.file(controller.imagePicked, height: 200)
-                    : controller.imageUrl != null
-                        ? Image.network(controller.imageUrl, height: 200)
-                        : SvgPicture.asset(
-                            'assets/images/add_item.svg',
-                            height: 200,
-                          );
-              },
-            ),
+    return Column(
+      children: [
+        _buildTitle(),
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          child: Observer(
+            builder: (_) {
+              return controller.imagePicked != null
+                  ? Image.file(controller.imagePicked, height: 200)
+                  : controller.imageUrl != null
+                      ? Image.network(controller.imageUrl, height: 200)
+                      : SvgPicture.asset(
+                          'assets/images/add_item.svg',
+                          height: 200,
+                        );
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -122,19 +120,18 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
     return Container(
       margin: const EdgeInsets.only(top: 10),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             margin: const EdgeInsets.only(right: 10),
             child: IconButton(
-              icon: FaIcon(FontAwesomeIcons.arrowLeft),
+              icon: const FaIcon(FontAwesomeIcons.arrowLeft),
               onPressed: () => Modular.to.pop(),
               color: Colors.white,
             ),
           ),
           Text(
             'Adicionar item na despensa',
-            style: themeData.textTheme.headline5.merge(TextStyle(color: Colors.white)),
+            style: themeData.textTheme.headline5.merge(const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -181,7 +178,7 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
               hintText: 'Selecionar produto',
               onChanged: controller.changeProductSelected,
               items: controller.productList.map<DropdownMenuItem<int>>(
-                (ProductResponse product) {
+                (product) {
                   return DropdownMenuItem<int>(
                     value: product.id,
                     child: Text(product.name),
@@ -225,7 +222,7 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
             hintText: 'Selecionar unidade de medida',
             onChanged: controller.changeUnitMeaSelected,
             items: controller.unitMeaList.map<DropdownMenuItem<int>>(
-              (UnitMeaModel unitMea) {
+              (unitMea) {
                 return DropdownMenuItem<int>(
                   value: unitMea.id,
                   child: Text(unitMea.name, style: themeData.textTheme.bodyText1),
@@ -252,12 +249,12 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
   }
 
   void increaseQuantity() {
-    var _quantity = _quantityEditingController.text.isNullOrEmpty() ? 0 : int.parse(_quantityEditingController.text);
+    final _quantity = _quantityEditingController.text.isNullOrEmpty() ? 0 : int.parse(_quantityEditingController.text);
     _quantityEditingController.text = (_quantity + 1).toString();
   }
 
   void decreaseQuantity() {
-    var _quantity = _quantityEditingController.text.isNullOrEmpty() ? 0 : int.parse(_quantityEditingController.text);
+    final _quantity = _quantityEditingController.text.isNullOrEmpty() ? 0 : int.parse(_quantityEditingController.text);
     if (_quantity > 0) {
       _quantityEditingController.text = (_quantity - 1).toString();
     }
@@ -301,11 +298,10 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
 
   Widget _buildImageField() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
           'Adicionar imagem:',
-          style: themeData.textTheme.headline6.merge(TextStyle(color: Colors.white)),
+          style: themeData.textTheme.headline6.merge(const TextStyle(color: Colors.white)),
         ),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -313,9 +309,9 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
             icon: FontAwesomeIcons.camera,
             onTap: () async {
               if (await PermissionUtils.checkCameraPermission()) {
-                getImage(ImageSource.camera);
+                await getImage(ImageSource.camera);
               } else {
-                PermissionUtils.showPermissionError(context);
+                await PermissionUtils.showPermissionError(context);
               }
             },
           ),
@@ -324,9 +320,9 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
           icon: FontAwesomeIcons.fileImage,
           onTap: () async {
             if (await PermissionUtils.checkStoragePermission()) {
-              getImage(ImageSource.gallery);
+              await getImage(ImageSource.gallery);
             } else {
-              PermissionUtils.showPermissionError(context);
+              await PermissionUtils.showPermissionError(context);
             }
           },
         ),
@@ -339,7 +335,7 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
       child: Container(
         width: _size.width * 0.5,
         height: 50,
-        margin: EdgeInsets.only(top: 10, bottom: 20),
+        margin: const EdgeInsets.only(top: 10, bottom: 20),
         child: Observer(builder: (_) {
           return RaisedButton(
             shape: RoundedRectangleBorder(
@@ -349,15 +345,15 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
             disabledColor: ColorsConfig.disabledButton,
             textColor: Colors.white,
             disabledTextColor: Colors.grey,
-            child: Text(
-              widget.storeId != null ? 'Atualizar'.toUpperCase() : 'Criar'.toUpperCase(),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
             onPressed: controller.canAddEditStore
                 ? widget.storeId != null
                     ? _editItemFromStore
                     : _addItemToStore
                 : null,
+            child: Text(
+              widget.storeId != null ? 'Atualizar'.toUpperCase() : 'Criar'.toUpperCase(),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           );
         }),
       ),

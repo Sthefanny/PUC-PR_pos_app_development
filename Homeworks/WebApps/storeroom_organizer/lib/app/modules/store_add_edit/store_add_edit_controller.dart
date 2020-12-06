@@ -46,28 +46,28 @@ abstract class _StoreAddEditControllerBase with Store {
   File imagePicked;
 
   @action
-  changeId(int value) => storeId = value;
+  int changeId(int value) => storeId = value;
   @action
-  changeProductSelected(int value) => productSelected = value;
+  int changeProductSelected(int value) => productSelected = value;
   @action
-  changeProductName(String value) => productName = value;
+  String changeProductName(String value) => productName = value;
   @action
-  changeUnitMeaSelected(int value) => unitMeaSelected = value;
+  int changeUnitMeaSelected(int value) => unitMeaSelected = value;
   @action
-  changeQuantity(int value) => quantity = value;
+  int changeQuantity(int value) => quantity = value;
   @action
-  changeImageUrl(String value) => imageUrl = value;
+  String changeImageUrl(String value) => imageUrl = value;
   @action
-  increaseQuantity() => quantity = quantity + 1;
+  void increaseQuantity() => quantity = quantity + 1;
   @action
-  decreaseQuantity() {
+  void decreaseQuantity() {
     if (quantity > 0) quantity = quantity - 1;
   }
 
   @action
-  changeProductNameIsVisible(bool value) => productNameIsVisible = value;
+  bool changeProductNameIsVisible(bool value) => productNameIsVisible = value;
   @action
-  changeImagePicked(File value) => imagePicked = value;
+  File changeImagePicked(File value) => imagePicked = value;
 
   @computed
   bool get hasProduct => productSelected != null && productSelected >= 0 || productName.isNotNullOrEmpty();
@@ -78,41 +78,43 @@ abstract class _StoreAddEditControllerBase with Store {
   Future<void> init() async {
     await listAllProducts();
     await listAllUnitMea();
-    if (storeId != null) getStoreItemInfo();
+    if (storeId != null) await getStoreItemInfo();
   }
 
   @action
   Future<void> listAllProducts() async {
     try {
-      var response = await _productService.listAllProducts();
-      productList.clear();
-      productList.addAll(response);
+      final response = await _productService.listAllProducts();
+      productList
+        ..clear()
+        ..addAll(response);
     } catch (e) {
-      throw e.toString();
+      throw Exception(e.toString());
     }
   }
 
   @action
   Future<void> listAllUnitMea() async {
     try {
-      unitMeaList.clear();
-      unitMeaList.add(UnitMeaModel(id: 0, name: unitMeaEnumToStr(UnitMeaEnum.unit)));
-      unitMeaList.add(UnitMeaModel(id: 1, name: unitMeaEnumToStr(UnitMeaEnum.weight)));
+      unitMeaList
+        ..clear()
+        ..add(UnitMeaModel(id: 0, name: unitMeaEnumToStr(UnitMeaEnum.unit)))
+        ..add(UnitMeaModel(id: 1, name: unitMeaEnumToStr(UnitMeaEnum.weight)));
     } catch (e) {
-      throw e.toString();
+      throw Exception(e.toString());
     }
   }
 
   Future<bool> addItemToStore() async {
     if (canAddEditStore) {
-      var request = StoreResponse(unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
+      final request = StoreResponse(unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
       StoreResponse response;
 
       await _storeService.addItemToStore(request).then((result) => response = result).catchError(DioConfig.handleError);
 
       if (response != null && response.id != null) {
         if (imagePicked != null) {
-          var imageResponse = await addImageToStoreItem(response.id);
+          final imageResponse = await addImageToStoreItem(response.id);
           return imageResponse;
         }
         return true;
@@ -156,14 +158,14 @@ abstract class _StoreAddEditControllerBase with Store {
 
   Future<bool> editItemFromStore() async {
     if (canAddEditStore) {
-      var request = StoreResponse(id: storeId, unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
+      final request = StoreResponse(id: storeId, unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
       StoreResponse response;
 
       await _storeService.editItemToStore(request).then((result) => response = result).catchError(DioConfig.handleError);
 
       if (response != null && response.id != null) {
         if (imagePicked != null) {
-          var imageResponse = await addImageToStoreItem(response.id);
+          final imageResponse = await addImageToStoreItem(response.id);
           return imageResponse;
         }
         return true;

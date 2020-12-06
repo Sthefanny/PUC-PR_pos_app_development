@@ -39,7 +39,6 @@ class _LoginPageState extends ModularState<LoginPage, LoginController> with Sing
                   height: _size.height,
                   decoration: VisualIdentityHelper.buildBackground(),
                   child: Column(
-                    mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
                       VisualIdentityHelper.buildLogo(logoWidth: _logoWidth),
                       _buildMenuBar(),
@@ -89,7 +88,7 @@ class _LoginPageState extends ModularState<LoginPage, LoginController> with Sing
     return Container(
       width: 300,
       height: 50,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: ColorsConfig.menuBar,
         borderRadius: BorderRadius.all(Radius.circular(25)),
       ),

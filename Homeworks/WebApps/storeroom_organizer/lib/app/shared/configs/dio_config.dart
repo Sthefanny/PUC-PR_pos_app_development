@@ -24,18 +24,18 @@ class DioConfig {
           });
           Modular.to.pushReplacementNamed('/login');
         }
-        var errorResponse = ErrorResponse.fromJson(res.data);
-        var messageToShow = '';
+        final errorResponse = ErrorResponse.fromJson(res.data);
+        final messageToShow = StringBuffer();
         if (errorResponse.hasError != null) {
-          for (Map<String, dynamic> error in errorResponse.errorList) {
-            messageToShow += error['message'].toString();
+          for (final Map<String, dynamic> error in errorResponse.errorList) {
+            messageToShow.writeln(error['message'].toString());
           }
         }
-        throw messageToShow;
+        throw Exception(messageToShow);
         break;
       default:
-        var messageToShow = 'Um problema ocorreu.';
-        throw messageToShow;
+        const messageToShow = 'Um problema ocorreu.';
+        throw Exception(messageToShow);
         break;
     }
   }
@@ -44,7 +44,7 @@ class DioConfig {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options) async {
-          var token = await _secureStorageRepository.getItem(ConfigurationEnum.token.toStr);
+          final token = await _secureStorageRepository.getItem(ConfigurationEnum.token.toStr);
           if (token != null && token.isNotEmpty) {
             // print('Token: $token');
             options.headers.addAll({'Authorization': token});

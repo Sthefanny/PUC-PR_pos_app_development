@@ -7,7 +7,7 @@ import 'login_store.dart';
 class LoginModule extends ChildModule {
   @override
   List<Bind> get binds => [
-        Bind((i) => LoginStore(), singleton: true),
+        Bind((i) => LoginStore()),
         Bind((i) => LoginController(i(), i())),
       ];
 

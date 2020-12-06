@@ -8,25 +8,25 @@ import '../configs/colors_config.dart';
 import '../configs/themes_config.dart';
 
 class SnackbarMessages {
-  static Future<dynamic> showError({@required BuildContext context, @required String description}) async {
+  static dynamic showError({@required BuildContext context, @required String description}) async {
     return _buildFlushBar(
-      icon: FaIcon(FontAwesomeIcons.exclamationTriangle, color: Colors.red, size: 18),
+      icon: const FaIcon(FontAwesomeIcons.exclamationTriangle, color: Colors.red, size: 18),
       descriptionColor: Colors.red,
       description: description,
     ).show(context);
   }
 
-  static Future<dynamic> showSuccess({@required BuildContext context, @required String description}) async {
+  static dynamic showSuccess({@required BuildContext context, @required String description}) async {
     return _buildFlushBar(
-      icon: FaIcon(FontAwesomeIcons.check, color: Colors.green, size: 18),
+      icon: const FaIcon(FontAwesomeIcons.check, color: Colors.green, size: 18),
       descriptionColor: ColorsConfig.textColor,
       description: description,
     ).show(context);
   }
 
-  static Future<dynamic> showInfo({@required BuildContext context, @required String description}) async {
+  static dynamic showInfo({@required BuildContext context, @required String description}) async {
     return _buildFlushBar(
-      icon: FaIcon(FontAwesomeIcons.exclamationTriangle, color: Colors.yellow, size: 18),
+      icon: const FaIcon(FontAwesomeIcons.exclamationTriangle, color: Colors.yellow, size: 18),
       descriptionColor: ColorsConfig.textColor,
       description: description,
     ).show(context);
@@ -45,38 +45,37 @@ class SnackbarMessages {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: icon,
       ),
-      flushbarPosition: FlushbarPosition.BOTTOM,
       backgroundColor: Colors.white,
-      duration: Duration(seconds: 3),
+      duration: const Duration(seconds: 3),
     );
   }
 
-  static void showPermissionErrorSnackbarAndroid({@required BuildContext context}) async {
-    Flushbar(
+  static Future<void> showPermissionErrorSnackbarAndroid({@required BuildContext context}) async {
+    await Flushbar(
       messageText: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
         child: Text(
           'Para continuar, precisamos que você nos dê as permissões necessárias',
-          style: themeData.textTheme.bodyText2.merge(TextStyle(color: Colors.red)),
+          style: themeData.textTheme.bodyText2.merge(const TextStyle(color: Colors.red)),
         ),
       ),
-      icon: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+      icon: const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
         child: FaIcon(FontAwesomeIcons.exclamationTriangle, color: Colors.red, size: 18),
       ),
       flushbarPosition: FlushbarPosition.BOTTOM,
       backgroundColor: Colors.white,
-      duration: Duration(seconds: 3),
+      duration: const Duration(seconds: 3),
     ).show(context);
   }
 
   static Future<void> showPermissionErrorDialogiOS({@required BuildContext context, @required Color primaryColor}) async {
-    var description = 'Para continuar, precisamos que você nos dê as permissões necessárias. Vá em Ajustes e selecione o nosso app para alterar as permissões.';
+    const description = 'Para continuar, precisamos que você nos dê as permissões necessárias. Vá em Ajustes e selecione o nosso app para alterar as permissões.';
 
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
-      builder: (BuildContext context) {
+      builder: (context) {
         return AlertDialog(
           title: Text('Permitir acesso', style: themeData.textTheme.subtitle1),
           content: SingleChildScrollView(
@@ -89,10 +88,10 @@ class SnackbarMessages {
           actions: <Widget>[
             TextButton(
               onPressed: () => Modular.to.pop(),
-              child: Text('cancelar'),
+              child: const Text('cancelar'),
             ),
-            TextButton(
-              onPressed: () => AppSettings.openAppSettings(),
+            const TextButton(
+              onPressed: AppSettings.openAppSettings,
               child: Text('ajustes'),
             ),
           ],

@@ -18,7 +18,7 @@ class AppModule extends MainModule {
   @override
   List<Bind> get binds => [
         Bind((i) => Dio()),
-        Bind((i) => FlutterSecureStorage()),
+        Bind((i) => const FlutterSecureStorage()),
         Bind((i) => SecureStorageRepository(i())),
         Bind((i) => DioConfig(i(), i())),
         Bind((i) => RestClient(i())),

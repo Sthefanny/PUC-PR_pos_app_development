@@ -4,22 +4,22 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../shared/helpers/snackbar_messages_helper.dart';
-import '../loading/loading_controller.dart';
-import '../../shared/configs/themes_config.dart';
 
+import '../../shared/configs/themes_config.dart';
 import '../../shared/configs/urls_config.dart';
 import '../../shared/extensions/string_extensions.dart';
+import '../../shared/helpers/snackbar_messages_helper.dart';
 import '../../shared/helpers/visual_identity_helper.dart';
 import '../../shared/models/responses/store_response.dart';
 import '../../shared/widgets/empty_list.dart';
+import '../loading/loading_controller.dart';
 import '../loading/loading_widget.dart';
 import 'home_controller.dart';
 import 'widgets/user_header_widget.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
-  const HomePage({Key key, this.title = "Home"}) : super(key: key);
+  const HomePage({Key key, this.title = 'Home'}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -32,8 +32,9 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
   @override
   void initState() {
     super.initState();
-    controller.setUserName();
-    controller.getStoreItems();
+    controller
+      ..setUserName()
+      ..getStoreItems();
   }
 
   @override
@@ -68,7 +69,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
       child: Observer(
         builder: (_) {
           if (controller.storeList == null) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (controller.storeList.isEmpty) {
             return EmptyList();
@@ -77,7 +78,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
             children: [
               Container(
                 margin: const EdgeInsets.only(bottom: 10),
-                child: Text('Despensa', style: themeData.textTheme.headline5.merge(TextStyle(color: Colors.white))),
+                child: Text('Despensa', style: themeData.textTheme.headline5.merge(const TextStyle(color: Colors.white))),
               ),
               Expanded(
                 child: ListView.builder(
@@ -85,7 +86,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
                   physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: controller.storeList.length,
                   itemBuilder: (_, i) {
-                    var item = controller.storeList[i];
+                    final item = controller.storeList[i];
                     return _buildSlidableCard(item);
                   },
                 ),
@@ -99,23 +100,22 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
 
   Widget _buildSlidableCard(StoreResponse item) {
     return Slidable(
-      actionPane: SlidableDrawerActionPane(),
-      actionExtentRatio: 0.25,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-        child: _buildItemCard(item),
-      ),
+      actionPane: const SlidableDrawerActionPane(),
       secondaryActions: <Widget>[
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: IconSlideAction(
             caption: 'Deletar',
             color: Colors.red,
-            iconWidget: FaIcon(FontAwesomeIcons.trash, color: Colors.white),
+            iconWidget: const FaIcon(FontAwesomeIcons.trash, color: Colors.white),
             onTap: () => _deleteItem(item.id),
           ),
         ),
       ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        child: _buildItemCard(item),
+      ),
     );
   }
 
@@ -124,7 +124,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
       onTap: () async {
         await Modular.to.pushNamed('/storeAddEdit', arguments: {'storeId': item.id});
 
-        controller.getStoreItems();
+        await controller.getStoreItems();
       },
       child: Container(
         width: _size.width,
@@ -135,7 +135,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -170,9 +170,9 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
       onPressed: () async {
         await Modular.to.pushNamed('/storeAddEdit');
 
-        controller.getStoreItems();
+        await controller.getStoreItems();
       },
-      child: FaIcon(FontAwesomeIcons.plus),
+      child: const FaIcon(FontAwesomeIcons.plus),
     );
   }
 

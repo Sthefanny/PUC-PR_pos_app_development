@@ -20,7 +20,7 @@ abstract class _SplashControllerBase with Store {
 
   @action
   Future<void> verifyIfTokenIsValid() async {
-    var token = await _secureStorageRepository.getItem(ConfigurationEnum.token.toStr);
+    final token = await _secureStorageRepository.getItem(ConfigurationEnum.token.toStr);
 
     if (token.isNotNullOrEmpty()) {
       await _dio.addAuth();

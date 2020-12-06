@@ -11,27 +11,27 @@ class StoreService extends Disposable {
   StoreService(this._repository);
 
   Future<List<StoreResponse>> listAllItemsFromStore() async {
-    var response = await _repository.listStoreItems();
+    final response = await _repository.listStoreItems();
 
     if (response != null) {
       return response;
     }
 
-    throw 'Ocorreu um erro ao tentar listar os itens da despensa.';
+    throw Exception('Ocorreu um erro ao tentar listar os itens da despensa.');
   }
 
   Future<StoreResponse> getItemFromStore(int id) async {
-    var response = await _repository.getItemFromStore(id);
+    final response = await _repository.getItemFromStore(id);
 
     if (response != null) {
       return response;
     }
 
-    throw 'Ocorreu um erro ao tentar retornar o item da despensa.';
+    throw Exception('Ocorreu um erro ao tentar retornar o item da despensa.');
   }
 
   Future<bool> deleteItemFromStore(int id) async {
-    var response = await _repository.deleteItemFromStore(id);
+    final response = await _repository.deleteItemFromStore(id);
 
     if (response.response.statusCode >= 200 && response.response.statusCode <= 300) {
       return true;
@@ -41,33 +41,33 @@ class StoreService extends Disposable {
   }
 
   Future<StoreResponse> addItemToStore(StoreResponse request) async {
-    var response = await _repository.addItemToStore(request);
+    final response = await _repository.addItemToStore(request);
 
     if (response != null) {
       return response;
     }
 
-    throw 'Ocorreu um erro ao tentar adicionar o item na despensa.';
+    throw Exception('Ocorreu um erro ao tentar adicionar o item na despensa.');
   }
 
   Future<StoreResponse> editItemToStore(StoreResponse request) async {
-    var response = await _repository.editItemToStore(request);
+    final response = await _repository.editItemToStore(request);
 
     if (response != null) {
       return response;
     }
 
-    throw 'Ocorreu um erro ao tentar editar o item na despensa.';
+    throw Exception('Ocorreu um erro ao tentar editar o item na despensa.');
   }
 
   Future<StoreResponse> addImageToItem(int id, File file) async {
-    var response = await _repository.addImageToItem(id, file);
+    final response = await _repository.addImageToItem(id, file);
 
     if (response != null) {
       return response;
     }
 
-    throw 'Ocorreu um erro ao tentar adicionar imagem ao item na despensa.';
+    throw Exception('Ocorreu um erro ao tentar adicionar imagem ao item na despensa.');
   }
 
   @override

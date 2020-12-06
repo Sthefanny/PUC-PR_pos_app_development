@@ -6,6 +6,7 @@ import '../../shared/configs/dio_config.dart';
 import '../../shared/extensions/string_extensions.dart';
 import '../../shared/models/requests/create_user_request.dart';
 import '../../shared/models/requests/login_request.dart';
+import '../../shared/models/responses/login_response.dart';
 import '../../shared/services/auth_service.dart';
 import 'login_store.dart';
 
@@ -38,19 +39,22 @@ abstract class _LoginControllerBase with Store {
   PageController get pageController => _loginStore.pageController;
 
   @action
-  changeSigninLogin(String value) => _loginStore.changeSigninLogin(value);
+  String changeSigninLogin(String value) => _loginStore.changeSigninLogin(value);
   @action
-  changeSigninPass(String value) => _loginStore.changeSigninPass(value);
+  String changeSigninPass(String value) => _loginStore.changeSigninPass(value);
   @action
-  changeSignupName(String value) => _loginStore.changeSignupName(value);
+  String changeSignupName(String value) => _loginStore.changeSignupName(value);
   @action
-  changeSignupLogin(String value) => _loginStore.changeSignupLogin(value);
+  String changeSignupLogin(String value) => _loginStore.changeSignupLogin(value);
   @action
-  changeSignupPass(String value) => _loginStore.changeSignupPass(value);
+  String changeSignupPass(String value) => _loginStore.changeSignupPass(value);
   @action
-  changeSignupConfirmPass(String value) => _loginStore.changeSignupConfirmPass(value);
+  String changeSignupConfirmPass(String value) => _loginStore.changeSignupConfirmPass(value);
+
   @action
-  changePageController(int value) => _loginStore.changePageController(value);
+  Future<void> changePageController(int value) {
+    return _loginStore.pageController?.animateToPage(value, duration: const Duration(milliseconds: 500), curve: Curves.decelerate);
+  }
 
   //end Store replication
 
@@ -62,11 +66,11 @@ abstract class _LoginControllerBase with Store {
   bool signupObscureConfirmPass = true;
 
   @action
-  toggleSigninObscurePass() => signinObscurePass = !signinObscurePass;
+  bool toggleSigninObscurePass() => signinObscurePass = !signinObscurePass;
   @action
-  toggleSignupObscurePass() => signupObscurePass = !signupObscurePass;
+  bool toggleSignupObscurePass() => signupObscurePass = !signupObscurePass;
   @action
-  toggleSignupObscureConfirmPass() => signupObscureConfirmPass = !signupObscureConfirmPass;
+  bool toggleSignupObscureConfirmPass() => signupObscureConfirmPass = !signupObscureConfirmPass;
 
   @computed
   bool get canSignIn => signinLogin.isNotNullOrEmpty() && signinPass.isNotNullOrEmpty();
@@ -80,12 +84,12 @@ abstract class _LoginControllerBase with Store {
   @action
   Future<bool> submitSignIn() async {
     if (canSignIn) {
-      var request = LoginRequest(email: signinLogin, password: signinPass);
-      var response;
+      final request = LoginRequest(email: signinLogin, password: signinPass);
+      LoginResponse response;
 
       await _authService.login(request).then((result) => response = result).catchError(DioConfig.handleError);
 
-      return response != null ? true : false;
+      return response ?? false;
     }
     return false;
   }
@@ -93,12 +97,12 @@ abstract class _LoginControllerBase with Store {
   @action
   Future<bool> submitSignUp() async {
     if (canSignUp) {
-      var request = CreateUserRequest(name: signupName, email: signupLogin, password: signupPass);
-      var response;
+      final request = CreateUserRequest(name: signupName, email: signupLogin, password: signupPass);
+      LoginResponse response;
 
       await _authService.createUser(request).then((result) => response = result).catchError(DioConfig.handleError);
 
-      return response != null ? true : false;
+      return response ?? false;
     }
     return false;
   }

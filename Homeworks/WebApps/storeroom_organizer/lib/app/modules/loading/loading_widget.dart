@@ -19,7 +19,6 @@ class _LoadingWidgetState extends ModularState<LoadingWidget, LoadingController>
   Widget build(BuildContext context) {
     return Observer(builder: (_) {
       return LoadingOverlay(
-        child: widget.child,
         isLoading: controller.isLoading,
         color: Colors.black,
         progressIndicator: Center(
@@ -29,10 +28,10 @@ class _LoadingWidgetState extends ModularState<LoadingWidget, LoadingController>
             child: Card(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
+                children: const <Widget>[
                   CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.purple)),
                   Padding(
-                    padding: const EdgeInsets.only(top: 10),
+                    padding: EdgeInsets.only(top: 10),
                     child: Text('Carregando...'),
                   ),
                 ],
@@ -40,6 +39,7 @@ class _LoadingWidgetState extends ModularState<LoadingWidget, LoadingController>
             ),
           ),
         ),
+        child: widget.child,
       );
     });
   }

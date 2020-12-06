@@ -50,7 +50,5 @@ vars:
     get: flutter pub get
     runner: flutter pub run build_runner
 scripts: 
-    build: $runner build
-    watch: $clean & $get & $runner watch
-    build_clean: $clean & $get & $runner build --delete-conflicting-outputs
-    watch_clean: $clean & $get & $runner watch --delete-conflicting-outputs
+    build: $clean & $get & $runner build --delete-conflicting-outputs
+    watch: $clean & $get & $runner watch --delete-conflicting-outputs

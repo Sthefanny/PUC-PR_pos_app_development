@@ -7,13 +7,13 @@ import 'home_page.dart';
 class HomeModule extends ChildModule {
   @override
   List<Bind> get binds => [
-        Bind((i) => StoreService(i()), singleton: true),
+        Bind((i) => StoreService(i())),
         Bind((i) => HomeController(i(), i())),
       ];
 
   @override
   List<ModularRouter> get routers => [
-        ModularRouter(Modular.initialRoute, child: (_, args) => HomePage()),
+        ModularRouter(Modular.initialRoute, child: (_, args) => const HomePage()),
       ];
 
   static Inject get to => Inject<HomeModule>.of();
