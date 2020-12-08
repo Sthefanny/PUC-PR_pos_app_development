@@ -89,7 +89,7 @@ abstract class _LoginControllerBase with Store {
 
       await _authService.login(request).then((result) => response = result).catchError(DioConfig.handleError);
 
-      return response ?? false;
+      return response != null ?? false;
     }
     return false;
   }
@@ -102,7 +102,7 @@ abstract class _LoginControllerBase with Store {
 
       await _authService.createUser(request).then((result) => response = result).catchError(DioConfig.handleError);
 
-      return response ?? false;
+      return response != null ?? false;
     }
     return false;
   }

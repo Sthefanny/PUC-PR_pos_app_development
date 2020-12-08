@@ -8,12 +8,14 @@ class LoginResponse {
   final String name;
   final String email;
   final String accessToken;
+  final String refreshToken;
 
   LoginResponse({
     this.id,
     this.name,
     this.email,
     this.accessToken,
+    this.refreshToken,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) => _$LoginResponseFromJson(json);

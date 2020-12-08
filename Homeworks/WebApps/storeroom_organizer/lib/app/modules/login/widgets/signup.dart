@@ -190,7 +190,7 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
       }
     }).catchError((error) {
       _loadingController.changeVisibility(false);
-      SnackbarMessages.showError(context: context, description: error);
+      SnackbarMessages.showError(context: context, description: error?.message);
     }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 

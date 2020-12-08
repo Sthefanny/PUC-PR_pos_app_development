@@ -19,6 +19,9 @@ abstract class RestClient {
   @POST('/User/login')
   Future<LoginResponse> login(@Body() LoginRequest request);
 
+  @PATCH('/User/token/refresh')
+  Future<LoginResponse> refreshToken(@Body() String refreshToken);
+
   @POST('/User/logout')
   Future<HttpResponse> logout();
 

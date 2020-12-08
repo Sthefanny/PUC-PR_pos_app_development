@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
 import '../../shared/configs/colors_config.dart';
+import '../../shared/helpers/dialogs_helper.dart';
 import '../../shared/helpers/visual_identity_helper.dart';
 import '../loading/loading_widget.dart';
 import 'login_controller.dart';
@@ -11,6 +12,10 @@ import 'widgets/signup.dart';
 import 'widgets/tab_indicator_painter.dart';
 
 class LoginPage extends StatefulWidget {
+  final String error;
+
+  const LoginPage({Key key, this.error}) : super(key: key);
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -21,6 +26,35 @@ class _LoginPageState extends ModularState<LoginPage, LoginController> with Sing
   Color left = Colors.black;
   Color right = Colors.white;
   double _logoWidth = 150;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.error != null && widget.error.isNotEmpty) {
+      Future.delayed(Duration.zero, () {
+        _showErrorDialog(
+          title: 'Erro',
+          description: widget.error,
+        );
+      });
+    }
+  }
+
+  void _showErrorDialog({@required String title, @required String description}) {
+    Dialogs.showDefaultDialog(
+      context: context,
+      title: title,
+      description: description,
+      actions: [
+        RaisedButton(
+          onPressed: () => Modular.to.pop(),
+          color: ColorsConfig.button,
+          child: const Text('Ok'),
+        )
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +111,7 @@ class _LoginPageState extends ModularState<LoginPage, LoginController> with Sing
           }
         },
         children: <Widget>[
-          SignIn(),
+          SignIn(parentContext: context),
           SignUp(),
         ],
       );

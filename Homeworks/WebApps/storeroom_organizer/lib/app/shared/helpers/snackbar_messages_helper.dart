@@ -52,12 +52,9 @@ class SnackbarMessages {
 
   static Future<void> showPermissionErrorSnackbarAndroid({@required BuildContext context}) async {
     await Flushbar(
-      messageText: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        child: Text(
-          'Para continuar, precisamos que você nos dê as permissões necessárias',
-          style: themeData.textTheme.bodyText2.merge(const TextStyle(color: Colors.red)),
-        ),
+      messageText: Text(
+        'Para continuar, precisamos que você nos dê as permissões necessárias',
+        style: themeData.textTheme.bodyText2.merge(const TextStyle(color: Colors.red)),
       ),
       icon: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 16),

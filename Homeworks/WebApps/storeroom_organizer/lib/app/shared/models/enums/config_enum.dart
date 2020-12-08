@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 enum ConfigurationEnum {
   token,
+  refreshToken,
   userName,
 }
 

@@ -1,6 +1,6 @@
 import 'package:flutter_modular/flutter_modular.dart';
 
-import '../configs/dio_config.dart';
+import '../configs/auth_config.dart';
 import '../models/enums/config_enum.dart';
 import '../models/requests/create_user_request.dart';
 import '../models/requests/login_request.dart';
@@ -11,17 +11,18 @@ import '../rest_client.dart';
 class AuthService extends Disposable {
   final RestClient _repository;
   final SecureStorageRepository _tokenService;
-  final DioConfig _dio;
+  final AuthConfig _authConfig;
 
-  AuthService(this._repository, this._tokenService, this._dio);
+  AuthService(this._repository, this._tokenService, this._authConfig);
 
   Future<LoginResponse> login(LoginRequest request) async {
     final response = await _repository.login(request);
 
     if (response.accessToken != null) {
       await _tokenService.setItem(ConfigurationEnum.token.toStr, response.accessToken);
+      await _tokenService.setItem(ConfigurationEnum.refreshToken.toStr, response.refreshToken);
       await _tokenService.setItem(ConfigurationEnum.userName.toStr, response.name);
-      _dio.addAuth();
+      _authConfig.addAuth();
     }
 
     return response;

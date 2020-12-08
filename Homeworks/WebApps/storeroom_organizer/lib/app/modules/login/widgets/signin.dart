@@ -10,6 +10,10 @@ import '../../loading/loading_controller.dart';
 import '../login_controller.dart';
 
 class SignIn extends StatefulWidget {
+  final BuildContext parentContext;
+
+  const SignIn({Key key, this.parentContext}) : super(key: key);
+
   @override
   _SignInState createState() => _SignInState();
 }
@@ -131,7 +135,7 @@ class _SignInState extends ModularState<SignIn, LoginController> {
       }
     }).catchError((error) {
       _loadingController.changeVisibility(false);
-      SnackbarMessages.showError(context: context, description: error);
+      SnackbarMessages.showError(context: widget.parentContext, description: error?.message);
     }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 }

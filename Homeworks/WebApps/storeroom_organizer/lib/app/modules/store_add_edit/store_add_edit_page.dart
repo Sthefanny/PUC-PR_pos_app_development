@@ -375,7 +375,7 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
       }
     }).catchError((error) {
       _loadingController.changeVisibility(false);
-      SnackbarMessages.showError(context: context, description: error);
+      SnackbarMessages.showError(context: context, description: error?.message);
     }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 
@@ -394,7 +394,7 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
       }
     }).catchError((error) {
       _loadingController.changeVisibility(false);
-      SnackbarMessages.showError(context: context, description: error);
+      SnackbarMessages.showError(context: context, description: error?.message);
     }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 }

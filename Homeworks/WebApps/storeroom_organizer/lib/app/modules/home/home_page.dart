@@ -189,7 +189,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
       }
     }).catchError((error) {
       _loadingController.changeVisibility(false);
-      SnackbarMessages.showError(context: context, description: error);
+      SnackbarMessages.showError(context: context, description: error?.message);
     }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 }

@@ -31,10 +31,15 @@ abstract class _HomeControllerBase with Store {
 
   Future<void> getStoreItems() async {
     try {
-      final response = await _service.listAllItemsFromStore();
-      storeList = ObservableList<StoreResponse>()
-        ..clear()
-        ..addAll(response);
+      List<StoreResponse> response;
+
+      await _service.listAllItemsFromStore().then((result) => response = result).catchError(DioConfig.handleError);
+
+      if (response != null) {
+        storeList = ObservableList<StoreResponse>()
+          ..clear()
+          ..addAll(response);
+      }
     } catch (e) {
       throw Exception(e.toString());
     }
