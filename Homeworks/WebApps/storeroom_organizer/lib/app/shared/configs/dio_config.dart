@@ -15,14 +15,27 @@ class DioConfig {
           refreshToken();
           break;
         }
-        final errorResponse = ErrorResponse.fromJson(res.data);
-        final messageToShow = StringBuffer();
-        if (errorResponse.hasError != null) {
-          for (final Map<String, dynamic> error in errorResponse.errorList) {
-            messageToShow.writeln(error['message'].toString());
-          }
+        if (res?.statusCode == 404) {
+          throw Exception('Ocorreu um problema. Por favor, contate o administrador');
         }
+        final messageToShow = StringBuffer();
+        try {
+          if (res.data != null && res.data != '') {
+            final errorResponse = ErrorResponse.fromJson(res.data);
+            if (errorResponse.hasError != null) {
+              for (final Map<String, dynamic> error in errorResponse.errorList) {
+                messageToShow.writeln(error['message'].toString());
+              }
+            }
+          } else {
+            messageToShow.writeln(res.statusMessage.toString());
+          }
+        } catch (e) {
+          rethrow;
+        }
+
         throw Exception(messageToShow.toString());
+
         break;
       default:
         const messageToShow = 'Um problema ocorreu.';

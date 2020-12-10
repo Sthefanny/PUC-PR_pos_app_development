@@ -9,6 +9,8 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  firebase_core: "^0.5.3"
+  firebase_crashlytics: "^0.2.4"
   dio_http_cache: ^0.2.11
   analyzer: ^0.40.6
   flutter_slidable: ^0.5.7
