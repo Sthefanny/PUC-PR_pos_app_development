@@ -4,14 +4,15 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:storeroom_organizer/app/shared/utils/user_utils.dart';
 
+import '../../shared/configs/dio_config.dart';
 import '../../shared/configs/themes_config.dart';
 import '../../shared/configs/urls_config.dart';
 import '../../shared/extensions/string_extensions.dart';
 import '../../shared/helpers/snackbar_messages_helper.dart';
 import '../../shared/helpers/visual_identity_helper.dart';
 import '../../shared/models/responses/store_response.dart';
+import '../../shared/utils/user_utils.dart';
 import '../../shared/widgets/empty_list.dart';
 import '../loading/loading_controller.dart';
 import '../loading/loading_widget.dart';
@@ -33,14 +34,25 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
   @override
   void initState() {
     super.initState();
-    controller
-      ..setUserName()
-      ..getStoreItems();
+    UserUtils.deleteToken();
+    initialize();
+  }
+
+  Future<void> initialize() async {
+    await controller.setUserName();
+    await controller.getStoreItems().catchError((error) async {
+      final errorHandled = await DioConfig.handleError(error, controller.getStoreItems);
+      if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
+        await initialize();
+        return;
+      }
+      _loadingController.changeVisibility(false);
+      SnackbarMessages.showError(context: context, description: errorHandled?.failure.toString());
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    UserUtils.deleteToken();
     _size = MediaQuery.of(context).size;
 
     return Scaffold(

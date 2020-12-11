@@ -4,7 +4,6 @@ import 'package:mobx/mobx.dart';
 import '../../shared/configs/dio_config.dart';
 import '../../shared/models/enums/unit_mea_enum.dart';
 import '../../shared/models/responses/store_response.dart';
-import '../../shared/repositories/secure_storage_repository.dart';
 import '../../shared/services/store_service.dart';
 import '../../shared/utils/user_utils.dart';
 
@@ -31,17 +30,15 @@ abstract class _HomeControllerBase with Store {
 
   Future<void> getStoreItems() async {
     try {
-      List<StoreResponse> response;
-
-      await _service.listAllItemsFromStore().then((result) => response = result).catchError(DioConfig.handleError);
-
-      if (response != null) {
-        storeList = ObservableList<StoreResponse>()
-          ..clear()
-          ..addAll(response);
-      }
+      await _service.listAllItemsFromStore().then((result) {
+        if (result != null) {
+          storeList = ObservableList<StoreResponse>()
+            ..clear()
+            ..addAll(result);
+        }
+      });
     } catch (e) {
-      throw Exception(e.toString());
+      rethrow;
     }
   }
 
@@ -61,7 +58,11 @@ abstract class _HomeControllerBase with Store {
   Future<bool> deleteItem(int storeId) async {
     bool response;
 
-    await _service.deleteItemFromStore(storeId).then((result) => response = result).catchError(DioConfig.handleError);
+    await _service.deleteItemFromStore(storeId).then((result) {
+      response = result;
+    }).catchError((error) async {
+      return DioConfig.handleError(error, deleteItem);
+    });
 
     return response;
   }

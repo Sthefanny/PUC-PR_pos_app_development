@@ -87,7 +87,11 @@ abstract class _LoginControllerBase with Store {
       final request = LoginRequest(email: signinLogin, password: signinPass);
       LoginResponse response;
 
-      await _authService.login(request).then((result) => response = result).catchError(DioConfig.handleError);
+      await _authService.login(request).then((result) {
+        response = result;
+      }).catchError((error) async {
+        return DioConfig.handleError(error, submitSignIn);
+      });
 
       return response != null ?? false;
     }
@@ -95,15 +99,17 @@ abstract class _LoginControllerBase with Store {
   }
 
   @action
-  Future<bool> submitSignUp() async {
-    if (canSignUp) {
-      final request = CreateUserRequest(name: signupName, email: signupLogin, password: signupPass);
+  Future<LoginResponse> submitSignUp() async {
+    try {
       LoginResponse response;
+      if (canSignUp) {
+        final request = CreateUserRequest(name: signupName, email: signupLogin, password: signupPass);
 
-      await _authService.createUser(request).then((result) => response = result).catchError(DioConfig.handleError);
-
-      return response != null ?? false;
+        response = await _authService.createUser(request).then((result) async => result);
+      }
+      return response;
+    } catch (e) {
+      rethrow;
     }
-    return false;
   }
 }

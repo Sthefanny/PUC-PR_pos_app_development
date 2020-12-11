@@ -84,9 +84,11 @@ abstract class _StoreAddEditControllerBase with Store {
   @action
   Future<void> listAllProducts() async {
     await _productService.listAllProducts().then((result) {
-      productList
-        ..clear()
-        ..addAll(result);
+      if (result != null) {
+        productList
+          ..clear()
+          ..addAll(result);
+      }
     }).catchError((error) async {
       return DioConfig.handleError(error, listAllProducts);
     });
@@ -109,7 +111,11 @@ abstract class _StoreAddEditControllerBase with Store {
       final request = StoreResponse(unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
       StoreResponse response;
 
-      await _storeService.addItemToStore(request).then((result) => response = result).catchError(DioConfig.handleError);
+      await _storeService.addItemToStore(request).then((result) {
+        response = result;
+      }).catchError((error) async {
+        return DioConfig.handleError(error, addItemToStore);
+      });
 
       if (response != null && response.id != null) {
         if (imagePicked != null) {
@@ -128,7 +134,11 @@ abstract class _StoreAddEditControllerBase with Store {
     if (storeId != null && imagePicked != null) {
       StoreResponse response;
 
-      await _storeService.addImageToItem(storeId, imagePicked).then((result) => response = result).catchError(DioConfig.handleError);
+      await _storeService.addImageToItem(storeId, imagePicked).then((result) {
+        response = result;
+      }).catchError((error) async {
+        return DioConfig.handleError(error, () => addImageToStoreItem(storeId));
+      });
 
       if (response != null && response.imageUrl != null) {
         return true;
@@ -140,38 +150,39 @@ abstract class _StoreAddEditControllerBase with Store {
   }
 
   Future<void> getStoreItemInfo() async {
-    StoreResponse response;
-
-    await _storeService.getItemFromStore(storeId).then((result) => response = result).catchError(DioConfig.handleError);
-
-    if (response != null && response.id != null) {
-      changeProductSelected(response.productId);
-      changeUnitMeaSelected(response.unitMea);
-      changeQuantity(response.quantity.toInt());
-      if (response.imageUrl.isNotNullOrEmpty()) changeImageUrl('${UrlConfig.baseUrl}${response.imageUrl}');
-      return;
-    }
-
-    throw Exception('Ocorreu um erro ao tentar carregar os dados.');
+    await _storeService.getItemFromStore(storeId).then((result) {
+      if (result != null && result.id != null) {
+        changeProductSelected(result.productId);
+        changeUnitMeaSelected(result.unitMea);
+        changeQuantity(result.quantity.toInt());
+        if (result.imageUrl.isNotNullOrEmpty()) changeImageUrl('${UrlConfig.baseUrl}${result.imageUrl}');
+        return;
+      }
+    }).catchError((error) async {
+      return DioConfig.handleError(error, listAllProducts);
+    });
   }
 
   Future<bool> editItemFromStore() async {
+    bool response = false;
+
     if (canAddEditStore) {
       final request = StoreResponse(id: storeId, unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
-      StoreResponse response;
 
-      await _storeService.editItemToStore(request).then((result) => response = result).catchError(DioConfig.handleError);
-
-      if (response != null && response.id != null) {
-        if (imagePicked != null) {
-          final imageResponse = await addImageToStoreItem(response.id);
-          return imageResponse;
+      await _storeService.editItemToStore(request).then((result) async {
+        if (result != null && result.id != null) {
+          if (imagePicked != null) {
+            final imageResponse = await addImageToStoreItem(result.id);
+            response = imageResponse;
+          }
+          response = true;
         }
-        return true;
-      }
 
-      return false;
+        response = false;
+      }).catchError((error) async {
+        return DioConfig.handleError(error, listAllProducts);
+      });
     }
-    return false;
+    return response;
   }
 }

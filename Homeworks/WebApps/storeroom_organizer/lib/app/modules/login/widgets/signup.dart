@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:storeroom_organizer/app/shared/configs/dio_config.dart';
+import 'package:storeroom_organizer/app/shared/models/default_response.dart';
 
 import '../../../shared/configs/colors_config.dart';
 import '../../../shared/helpers/snackbar_messages_helper.dart';
@@ -183,14 +185,18 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
 
     controller.submitSignUp().then((result) {
       _loadingController.changeVisibility(false);
-      if (result) {
+      if (result != null) {
         SnackbarMessages.showSuccess(context: context, description: 'Usuário criado com sucesso!');
         _clearAllFields();
         controller.changePageController(0);
+      } else {
+        _loadingController.changeVisibility(false);
+        SnackbarMessages.showError(context: context, description: 'Ocorreu um erro, por favor tente novamente em alguns minutos.');
       }
-    }).catchError((error) {
+    }).catchError((error) async {
+      final errorHandled = await DioConfig.handleError(error, controller.submitSignUp);
       _loadingController.changeVisibility(false);
-      SnackbarMessages.showError(context: context, description: error?.message);
+      SnackbarMessages.showError(context: context, description: errorHandled?.failure.toString());
     }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 

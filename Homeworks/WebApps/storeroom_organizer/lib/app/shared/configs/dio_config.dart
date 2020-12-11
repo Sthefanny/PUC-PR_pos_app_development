@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
+import '../models/default_response.dart';
 import '../models/enums/config_enum.dart';
 import '../models/responses/error_response.dart';
 import '../repositories/secure_storage_repository.dart';
@@ -10,20 +11,25 @@ import '../utils/user_utils.dart';
 import 'auth_config.dart';
 
 class DioConfig {
-  static Future<bool> handleError(dynamic error, Function retryFunction) async {
+  static Future<DefaultResponse> handleError(dynamic error, Function retryFunction) async {
+    DefaultResponse response;
+
     switch (error.runtimeType) {
       case DioError:
         final res = (error as DioError).response;
         if (res?.statusCode == 401) {
           if (await refreshToken()) {
             retryFunction();
-            return true;
+            response = DefaultResponse<bool>(success: true);
+            break;
           }
-          return false;
+          response = DefaultResponse<String>(failure: 'Ocorreu um problema. Por favor, contate o administrador');
+          break;
         }
         if (res?.statusCode == 404) {
           await FirebaseCrashlytics.instance.log('Rota não encontrada: ${res?.request?.path}');
-          throw Exception('Ocorreu um problema. Por favor, contate o administrador');
+          response = DefaultResponse<String>(failure: 'Ocorreu um problema. Por favor, contate o administrador');
+          break;
         }
         final messageToShow = StringBuffer();
         try {
@@ -31,24 +37,33 @@ class DioConfig {
             final errorResponse = ErrorResponse.fromJson(res.data);
             if (errorResponse.hasError != null) {
               for (final Map<String, dynamic> error in errorResponse.errorList) {
-                messageToShow.writeln(error['message'].toString());
+                if (messageToShow.isNotEmpty) {
+                  messageToShow.writeln(error['message'].toString());
+                } else {
+                  messageToShow.write(error['message'].toString());
+                }
               }
             }
           } else {
-            messageToShow.writeln(res.statusMessage.toString());
+            if (messageToShow.isNotEmpty) {
+              messageToShow.writeln(res.statusMessage.toString());
+            } else {
+              messageToShow.write(res.statusMessage.toString());
+            }
           }
         } catch (e) {
-          rethrow;
+          response = DefaultResponse<String>(failure: 'Ocorreu um problema. Por favor, contate o administrador');
+          break;
         }
 
-        throw Exception(messageToShow.toString());
-
-        return false;
+        response = DefaultResponse<String>(failure: messageToShow.toString());
+        break;
       default:
         const messageToShow = 'Um problema ocorreu.';
-        throw Exception(messageToShow);
-        return false;
+        response = DefaultResponse<String>(failure: messageToShow.toString());
+        break;
     }
+    return response;
   }
 
   static Future<bool> refreshToken() async {
