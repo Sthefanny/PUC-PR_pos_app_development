@@ -1,12 +1,12 @@
 import 'package:flutter_modular/flutter_modular.dart';
 
 import '../configs/auth_config.dart';
-import '../models/enums/config_enum.dart';
 import '../models/requests/create_user_request.dart';
 import '../models/requests/login_request.dart';
 import '../models/responses/login_response.dart';
 import '../repositories/secure_storage_repository.dart';
 import '../rest_client.dart';
+import '../utils/user_utils.dart';
 
 class AuthService extends Disposable {
   final RestClient _repository;
@@ -19,9 +19,8 @@ class AuthService extends Disposable {
     final response = await _repository.login(request);
 
     if (response.accessToken != null) {
-      await _tokenService.setItem(ConfigurationEnum.token.toStr, response.accessToken);
-      await _tokenService.setItem(ConfigurationEnum.refreshToken.toStr, response.refreshToken);
-      await _tokenService.setItem(ConfigurationEnum.userName.toStr, response.name);
+      await UserUtils.saveUserData(response);
+      await UserUtils.loadFirebaseKey();
       _authConfig.addAuth();
     }
 

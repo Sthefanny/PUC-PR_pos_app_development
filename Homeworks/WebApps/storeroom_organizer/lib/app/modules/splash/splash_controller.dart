@@ -4,6 +4,7 @@ import '../../shared/configs/auth_config.dart';
 import '../../shared/extensions/string_extensions.dart';
 import '../../shared/models/enums/config_enum.dart';
 import '../../shared/repositories/secure_storage_repository.dart';
+import '../../shared/utils/user_utils.dart';
 
 part 'splash_controller.g.dart';
 
@@ -25,6 +26,7 @@ abstract class _SplashControllerBase with Store {
     if (token.isNotNullOrEmpty()) {
       await _authConfig.addAuth();
       tokenIsValid = true;
+      await UserUtils.loadFirebaseKey();
     } else {
       tokenIsValid = false;
     }

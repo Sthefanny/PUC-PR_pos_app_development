@@ -83,14 +83,13 @@ abstract class _StoreAddEditControllerBase with Store {
 
   @action
   Future<void> listAllProducts() async {
-    try {
-      final response = await _productService.listAllProducts();
+    await _productService.listAllProducts().then((result) {
       productList
         ..clear()
-        ..addAll(response);
-    } catch (e) {
-      throw Exception(e.toString());
-    }
+        ..addAll(result);
+    }).catchError((error) async {
+      return DioConfig.handleError(error, listAllProducts);
+    });
   }
 
   @action

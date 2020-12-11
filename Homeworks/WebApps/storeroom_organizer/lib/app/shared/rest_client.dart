@@ -16,16 +16,16 @@ part 'rest_client.g.dart';
 abstract class RestClient {
   factory RestClient(Dio dio, {String baseUrl}) = _RestClient;
 
-  @POST('/User/login')
+  @POST('/Auth/login')
   Future<LoginResponse> login(@Body() LoginRequest request);
 
-  @PATCH('/User/token/refresh')
-  Future<LoginResponse> refreshToken(@Body() String refreshToken);
+  @PATCH('/Auth/token/refresh')
+  Future<LoginResponse> refreshToken(@Body() Map<String, dynamic> map);
 
-  @POST('/User/logout')
+  @POST('/Auth/logout')
   Future<HttpResponse> logout();
 
-  @POST('/User')
+  @POST('/Auth')
   Future<LoginResponse> createUser(@Body() CreateUserRequest request);
 
   @GET('/Product/list')

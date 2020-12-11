@@ -9,6 +9,8 @@ class LoginResponse {
   final String email;
   final String accessToken;
   final String refreshToken;
+  final int minimumProductListPurchase;
+  final int daysToExpire;
 
   LoginResponse({
     this.id,
@@ -16,6 +18,8 @@ class LoginResponse {
     this.email,
     this.accessToken,
     this.refreshToken,
+    this.minimumProductListPurchase,
+    this.daysToExpire,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) => _$LoginResponseFromJson(json);

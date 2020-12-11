@@ -4,6 +4,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:storeroom_organizer/app/shared/utils/user_utils.dart';
 
 import '../../shared/configs/themes_config.dart';
 import '../../shared/configs/urls_config.dart';
@@ -39,6 +40,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    UserUtils.deleteToken();
     _size = MediaQuery.of(context).size;
 
     return Scaffold(

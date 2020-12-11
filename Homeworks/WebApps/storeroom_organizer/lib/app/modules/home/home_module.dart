@@ -8,7 +8,7 @@ class HomeModule extends ChildModule {
   @override
   List<Bind> get binds => [
         Bind((i) => StoreService(i())),
-        Bind((i) => HomeController(i(), i())),
+        Bind((i) => HomeController(i())),
       ];
 
   @override

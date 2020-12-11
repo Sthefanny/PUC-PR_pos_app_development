@@ -2,11 +2,11 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../shared/configs/dio_config.dart';
-import '../../shared/models/enums/config_enum.dart';
 import '../../shared/models/enums/unit_mea_enum.dart';
 import '../../shared/models/responses/store_response.dart';
 import '../../shared/repositories/secure_storage_repository.dart';
 import '../../shared/services/store_service.dart';
+import '../../shared/utils/user_utils.dart';
 
 part 'home_controller.g.dart';
 
@@ -15,9 +15,8 @@ class HomeController = _HomeControllerBase with _$HomeController;
 
 abstract class _HomeControllerBase with Store {
   final StoreService _service;
-  final SecureStorageRepository _secureStorageService;
 
-  _HomeControllerBase(this._service, this._secureStorageService);
+  _HomeControllerBase(this._service);
 
   @observable
   String userName = '';
@@ -26,7 +25,8 @@ abstract class _HomeControllerBase with Store {
 
   @action
   Future<void> setUserName() async {
-    userName = await _secureStorageService.getItem(ConfigurationEnum.userName.toStr);
+    final _userData = await UserUtils.getUserData();
+    userName = _userData.name;
   }
 
   Future<void> getStoreItems() async {
