@@ -11,7 +11,9 @@ import '../utils/user_utils.dart';
 import 'auth_config.dart';
 
 class DioConfig {
-  static Future<DefaultResponse> handleError(dynamic error, Function retryFunction) async {
+  static Future<DefaultResponse> handleError(
+    dynamic error,
+  ) async {
     DefaultResponse response;
 
     switch (error.runtimeType) {
@@ -19,7 +21,6 @@ class DioConfig {
         final res = (error as DioError).response;
         if (res?.statusCode == 401) {
           if (await refreshToken()) {
-            retryFunction();
             response = DefaultResponse<bool>(success: true);
             break;
           }

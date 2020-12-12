@@ -11,6 +11,7 @@ class StoreItemRequest {
   final String expirationDate;
   final String observation;
   final bool recurrent;
+  final int id;
   final int storeId;
 
   StoreItemRequest({
@@ -21,6 +22,7 @@ class StoreItemRequest {
     this.expirationDate,
     this.observation,
     this.recurrent,
+    this.id,
     this.storeId,
   });
 

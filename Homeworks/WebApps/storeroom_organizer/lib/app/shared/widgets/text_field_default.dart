@@ -19,6 +19,8 @@ class TextFieldWidget extends StatelessWidget {
   final bool obscureText;
   final TextCapitalization textCapitalization;
   final String initialValue;
+  final bool readOnly;
+  final Function onTap;
 
   const TextFieldWidget({
     Key key,
@@ -36,6 +38,8 @@ class TextFieldWidget extends StatelessWidget {
     this.obscureText,
     this.textCapitalization,
     this.initialValue,
+    this.readOnly,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -57,6 +61,8 @@ class TextFieldWidget extends StatelessWidget {
         textInputAction: textInputAction ?? TextInputAction.done,
         obscureText: obscureText ?? false,
         textCapitalization: textCapitalization ?? TextCapitalization.sentences,
+        readOnly: readOnly ?? false,
+        onTap: onTap,
       ),
     );
   }

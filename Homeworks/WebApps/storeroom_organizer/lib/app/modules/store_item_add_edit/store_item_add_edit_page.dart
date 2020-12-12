@@ -9,10 +9,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../shared/configs/colors_config.dart';
+import '../../shared/configs/dio_config.dart';
 import '../../shared/configs/themes_config.dart';
 import '../../shared/extensions/string_extensions.dart';
 import '../../shared/helpers/snackbar_messages_helper.dart';
 import '../../shared/helpers/visual_identity_helper.dart';
+import '../../shared/utils/date_utils.dart';
 import '../../shared/utils/permission_utils.dart';
 import '../../shared/widgets/dropdown_button_default.dart';
 import '../../shared/widgets/text_field_default.dart';
@@ -23,7 +25,8 @@ import 'store_item_add_edit_controller.dart';
 class StoreItemAddEditPage extends StatefulWidget {
   final String title;
   final int storeId;
-  const StoreItemAddEditPage({Key key, this.title = 'StoreAddEdit', this.storeId}) : super(key: key);
+  final int id;
+  const StoreItemAddEditPage({Key key, this.title = 'StoreAddEdit', @required this.storeId, this.id}) : super(key: key);
 
   @override
   _StoreItemAddEditPageState createState() => _StoreItemAddEditPageState();
@@ -32,6 +35,7 @@ class StoreItemAddEditPage extends StatefulWidget {
 class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, StoreItemAddEditController> {
   final LoadingController _loadingController = Modular.get();
   final _quantityEditingController = TextEditingController();
+  final _expirationDateEditingController = TextEditingController();
   ReactionDisposer _disposer;
   Size _size;
   final picker = ImagePicker();
@@ -41,7 +45,7 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
     super.initState();
     _validateQuantityText();
     controller
-      ..changeId(widget.storeId)
+      ..changeStoreItemId(widget.storeId)
       ..init();
   }
 
@@ -143,13 +147,50 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
       child: Column(
         children: [
+          _buildImageField(),
           _buildProductFields(),
           _buildProductNameField(),
           _buildUnitMeaSelect(),
           _buildQuantityFields(),
-          _buildImageField(),
+          _buildExpirationDateField(),
+          _buildRecurrentCheckbox(),
+          _buildObservationField(),
         ],
       ),
+    );
+  }
+
+  Widget _buildImageField() {
+    return Row(
+      children: [
+        Text(
+          'Adicionar imagem:',
+          style: themeData.textTheme.headline6.merge(const TextStyle(color: Colors.white)),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          child: _buildMiniButton(
+            icon: FontAwesomeIcons.camera,
+            onTap: () async {
+              if (await PermissionUtils.checkCameraPermission()) {
+                await getImage(ImageSource.camera);
+              } else {
+                await PermissionUtils.showPermissionError(context);
+              }
+            },
+          ),
+        ),
+        _buildMiniButton(
+          icon: FontAwesomeIcons.fileImage,
+          onTap: () async {
+            if (await PermissionUtils.checkStoragePermission()) {
+              await getImage(ImageSource.gallery);
+            } else {
+              await PermissionUtils.showPermissionError(context);
+            }
+          },
+        ),
+      ],
     );
   }
 
@@ -193,21 +234,23 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
   }
 
   Widget _buildProductNameField() {
-    return Observer(builder: (_) {
-      return Visibility(
-        visible: controller.productNameIsVisible,
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 10),
-          child: TextFieldWidget(
-            cursorColor: ColorsConfig.purpleDark,
-            hintText: 'Nome do produto',
-            onChanged: controller.changeProductName,
-            keyboardType: TextInputType.text,
-            textInputAction: TextInputAction.next,
+    return Observer(
+      builder: (_) {
+        return Visibility(
+          visible: controller.productNameIsVisible,
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFieldWidget(
+              cursorColor: ColorsConfig.purpleDark,
+              hintText: 'Nome do produto',
+              onChanged: controller.changeProductName,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   Widget _buildUnitMeaSelect() {
@@ -279,6 +322,107 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
     );
   }
 
+  Widget _buildExpirationDateField() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextFieldWidget(
+              cursorColor: ColorsConfig.purpleDark,
+              hintText: 'Data de validade',
+              onChanged: controller.changeProductSelectedDateFormatted,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
+              textEditingController: _expirationDateEditingController,
+              readOnly: true,
+              onTap: _selectDate,
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(left: 20),
+            color: ColorsConfig.button,
+            width: 52,
+            height: 52,
+            child: IconButton(icon: const FaIcon(FontAwesomeIcons.calendarAlt, color: Colors.white), iconSize: 35, onPressed: _selectDate),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _selectDate() async {
+    final today = DateTime.now();
+
+    final date = await showDatePicker(
+        context: context,
+        initialDate: controller.productSelectedDate,
+        firstDate: DateTime(today.year),
+        lastDate: DateTime(today.year + 5),
+        helpText: 'Selecionar data de expiração',
+        cancelText: 'Cancelar'.toUpperCase(),
+        builder: (_, child) {
+          return Theme(
+            data: ThemeData.light().copyWith(
+              colorScheme: const ColorScheme.light().copyWith(
+                primary: ColorsConfig.button,
+              ),
+            ),
+            child: child,
+          );
+        });
+
+    if (date != null) {
+      final formattedDate = Dateutils.formatDate(date);
+      controller
+        ..changeProductSelectedDate(date)
+        ..changeProductSelectedDateFormatted(formattedDate);
+
+      _expirationDateEditingController.text = formattedDate;
+    }
+  }
+
+  Widget _buildRecurrentCheckbox() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          Observer(
+            builder: (_) {
+              return Transform.scale(
+                scale: 2,
+                child: Checkbox(
+                  value: controller.productIsRecurrent,
+                  onChanged: (value) => controller.changeProductIsRecurrent(!value),
+                  activeColor: ColorsConfig.button,
+                ),
+              );
+            },
+          ),
+          Expanded(
+              child: Text(
+            'Item recorrente',
+            style: themeData.textTheme.headline6.merge(const TextStyle(color: Colors.white)),
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildObservationField() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: TextFieldWidget(
+        cursorColor: ColorsConfig.purpleDark,
+        hintText: 'Observação',
+        onChanged: controller.changeProductObservation,
+        keyboardType: TextInputType.multiline,
+        textInputAction: TextInputAction.newline,
+        maxLines: 6,
+      ),
+    );
+  }
+
   Widget _buildMiniButton({@required IconData icon, Function onTap}) {
     return InkWell(
       onTap: onTap,
@@ -293,40 +437,6 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
           child: FaIcon(icon, color: Colors.white, size: 22),
         ),
       ),
-    );
-  }
-
-  Widget _buildImageField() {
-    return Row(
-      children: [
-        Text(
-          'Adicionar imagem:',
-          style: themeData.textTheme.headline6.merge(const TextStyle(color: Colors.white)),
-        ),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          child: _buildMiniButton(
-            icon: FontAwesomeIcons.camera,
-            onTap: () async {
-              if (await PermissionUtils.checkCameraPermission()) {
-                await getImage(ImageSource.camera);
-              } else {
-                await PermissionUtils.showPermissionError(context);
-              }
-            },
-          ),
-        ),
-        _buildMiniButton(
-          icon: FontAwesomeIcons.fileImage,
-          onTap: () async {
-            if (await PermissionUtils.checkStoragePermission()) {
-              await getImage(ImageSource.gallery);
-            } else {
-              await PermissionUtils.showPermissionError(context);
-            }
-          },
-        ),
-      ],
     );
   }
 
@@ -367,15 +477,20 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
 
     controller.changeQuantity(int.parse(_quantityEditingController.text));
 
-    controller.addItemToStore().then((result) {
+    controller.addItemToStore(widget.storeId).then((result) {
       _loadingController.changeVisibility(false);
       if (result) {
         Modular.to.pop();
         SnackbarMessages.showSuccess(context: context, description: 'Produto incluído na despensa com sucesso!');
       }
-    }).catchError((error) {
+    }).catchError((error) async {
+      final errorHandled = await DioConfig.handleError(error);
+      if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
+        _loadingController.changeVisibility(false);
+        return _addItemToStore();
+      }
       _loadingController.changeVisibility(false);
-      SnackbarMessages.showError(context: context, description: error?.message);
+      SnackbarMessages.showError(context: context, description: errorHandled?.failure.toString());
     }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 
@@ -386,15 +501,20 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
 
     controller.changeQuantity(int.parse(_quantityEditingController.text));
 
-    controller.editItemFromStore().then((result) {
+    controller.editItemFromStore(storeId: widget.storeId, id: widget.id).then((result) {
       _loadingController.changeVisibility(false);
       if (result) {
         Modular.to.pop();
         SnackbarMessages.showSuccess(context: context, description: 'Produto atualizado com sucesso!');
       }
-    }).catchError((error) {
+    }).catchError((error) async {
+      final errorHandled = await DioConfig.handleError(error);
+      if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
+        _loadingController.changeVisibility(false);
+        return _editItemFromStore();
+      }
       _loadingController.changeVisibility(false);
-      SnackbarMessages.showError(context: context, description: error?.message);
+      SnackbarMessages.showError(context: context, description: errorHandled?.failure.toString());
     }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 }

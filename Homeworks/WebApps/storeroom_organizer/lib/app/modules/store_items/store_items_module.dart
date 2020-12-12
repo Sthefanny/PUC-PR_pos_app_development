@@ -13,7 +13,7 @@ class StoreItemsModule extends ChildModule {
 
   @override
   List<ModularRouter> get routers => [
-        ModularRouter(Modular.initialRoute, child: (_, args) => const StoreItemsPage()),
+        ModularRouter(Modular.initialRoute, child: (_, args) => StoreItemsPage(storeId: args.data['storeId'], storeName: args.data['storeName'])),
       ];
 
   static Inject get to => Inject<StoreItemsModule>.of();

@@ -47,7 +47,7 @@ class UserHeaderWidget extends StatelessWidget {
       barrierDismissible: true,
       builder: (_) {
         return AlertDialog(
-          title: Text('Olá Stel, o que deseja fazer?', style: themeData.textTheme.subtitle1),
+          title: Text('Olá $userName, o que deseja fazer?', style: themeData.textTheme.subtitle1),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[

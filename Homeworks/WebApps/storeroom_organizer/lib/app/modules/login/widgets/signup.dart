@@ -193,7 +193,11 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
         SnackbarMessages.showError(context: context, description: 'Ocorreu um erro, por favor tente novamente em alguns minutos.');
       }
     }).catchError((error) async {
-      final errorHandled = await DioConfig.handleError(error, controller.submitSignUp);
+      final errorHandled = await DioConfig.handleError(error);
+      if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
+        _loadingController.changeVisibility(false);
+        return _signUp();
+      }
       _loadingController.changeVisibility(false);
       SnackbarMessages.showError(context: context, description: errorHandled?.failure.toString());
     }).whenComplete(() => _loadingController.changeVisibility(false));

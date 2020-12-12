@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
 
@@ -30,7 +31,7 @@ abstract class _StoreItemAddEditControllerBase with Store {
   @observable
   List<UnitMeaModel> unitMeaList = ObservableList<UnitMeaModel>();
   @observable
-  int storeId;
+  int storeItemId;
   @observable
   int productSelected;
   @observable
@@ -45,9 +46,17 @@ abstract class _StoreItemAddEditControllerBase with Store {
   bool productNameIsVisible = false;
   @observable
   File imagePicked;
+  @observable
+  String productObservation;
+  @observable
+  bool productIsRecurrent = false;
+  @observable
+  DateTime productSelectedDate = DateTime.now();
+  @observable
+  String productSelectedDateFormatted;
 
   @action
-  int changeId(int value) => storeId = value;
+  int changeStoreItemId(int value) => storeItemId = value;
   @action
   int changeProductSelected(int value) => productSelected = value;
   @action
@@ -66,6 +75,15 @@ abstract class _StoreItemAddEditControllerBase with Store {
   }
 
   @action
+  String changeProductObservation(String value) => productObservation = value;
+  @action
+  bool changeProductIsRecurrent(bool value) => productIsRecurrent = !value;
+  @action
+  DateTime changeProductSelectedDate(DateTime value) => productSelectedDate = value;
+  @action
+  String changeProductSelectedDateFormatted(String value) => productSelectedDateFormatted = value;
+
+  @action
   bool changeProductNameIsVisible(bool value) => productNameIsVisible = value;
   @action
   File changeImagePicked(File value) => imagePicked = value;
@@ -79,20 +97,26 @@ abstract class _StoreItemAddEditControllerBase with Store {
   Future<void> init() async {
     await listAllProducts();
     await listAllUnitMea();
-    if (storeId != null) await getStoreItemInfo();
+    if (storeItemId != null) await getStoreItemInfo();
   }
 
-  @action
   Future<void> listAllProducts() async {
-    await _productService.listAllProducts().then((result) {
-      if (result != null) {
-        productList
-          ..clear()
-          ..addAll(result);
-      }
-    }).catchError((error) async {
-      return DioConfig.handleError(error, listAllProducts);
-    });
+    try {
+      await _productService.listAllProducts().then((result) {
+        if (result != null) {
+          productList
+            ..clear()
+            ..addAll(result);
+        }
+      }).catchError((error) async {
+        final errorHandled = await DioConfig.handleError(error);
+        if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
+          return listAllProducts();
+        }
+      });
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @action
@@ -107,83 +131,112 @@ abstract class _StoreItemAddEditControllerBase with Store {
     }
   }
 
-  Future<bool> addItemToStore() async {
-    if (canAddEditStore) {
-      final request = StoreItemRequest(unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
-      StoreItemResponse response;
+  Future<bool> addItemToStore(int storeId) async {
+    try {
+      if (canAddEditStore) {
+        final request = StoreItemRequest(
+          unitMea: unitMeaSelected,
+          product: productName,
+          productId: productSelected,
+          quantity: quantity.toDouble(),
+          expirationDate: productSelectedDate.toIso8601String(),
+          observation: productObservation,
+          recurrent: productIsRecurrent,
+          storeId: storeId,
+        );
+        StoreItemResponse response;
 
-      await _storeService.addItemToStore(request).then((result) {
-        response = result;
-      }).catchError((error) async {
-        return DioConfig.handleError(error, addItemToStore);
-      });
+        await _storeService.addItemToStore(request).then((result) {
+          response = result;
+        });
 
-      if (response != null && response.id != null) {
-        if (imagePicked != null) {
-          final imageResponse = await addImageToStoreItem(response.id);
-          return imageResponse;
+        if (response != null && response.id != null) {
+          if (imagePicked != null) {
+            final imageResponse = await addImageToStoreItem(response.id);
+            return imageResponse;
+          }
+          return true;
         }
-        return true;
-      }
 
+        return false;
+      }
       return false;
+    } catch (e) {
+      rethrow;
     }
-    return false;
   }
 
   Future<bool> addImageToStoreItem(int storeId) async {
-    if (storeId != null && imagePicked != null) {
-      StoreItemResponse response;
+    try {
+      if (storeId != null && imagePicked != null) {
+        StoreItemResponse response;
 
-      await _storeService.addImageToItem(storeId, imagePicked).then((result) {
-        response = result;
-      }).catchError((error) async {
-        return DioConfig.handleError(error, () => addImageToStoreItem(storeId));
-      });
+        await _storeService.addImageToItem(storeId, imagePicked).then((result) {
+          response = result;
+        });
 
-      if (response != null && response.imageUrl != null) {
-        return true;
+        if (response != null && response.imageUrl != null) {
+          return true;
+        }
+
+        return false;
       }
-
       return false;
+    } catch (e) {
+      rethrow;
     }
-    return false;
   }
 
   Future<void> getStoreItemInfo() async {
-    await _storeService.getItemFromStore(storeId).then((result) {
-      if (result != null && result.id != null) {
-        changeProductSelected(result.productId);
-        changeUnitMeaSelected(result.unitMea);
-        changeQuantity(result.quantity.toInt());
-        if (result.imageUrl.isNotNullOrEmpty()) changeImageUrl('${UrlConfig.baseUrl}${result.imageUrl}');
-        return;
-      }
-    }).catchError((error) async {
-      return DioConfig.handleError(error, listAllProducts);
-    });
+    try {
+      await _storeService.getItemFromStore(storeItemId).then(
+        (result) {
+          if (result != null && result.id != null) {
+            changeProductSelected(result.productId);
+            changeUnitMeaSelected(result.unitMea);
+            changeQuantity(result.quantity.toInt());
+            if (result.imageUrl.isNotNullOrEmpty()) changeImageUrl('${UrlConfig.baseUrl}${result.imageUrl}');
+            return;
+          }
+        },
+      );
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  Future<bool> editItemFromStore() async {
-    bool response = false;
+  Future<bool> editItemFromStore({@required int storeId, @required int id}) async {
+    try {
+      bool response = false;
 
-    if (canAddEditStore) {
-      final request = StoreItemRequest(unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
+      if (canAddEditStore) {
+        final request = StoreItemRequest(
+          unitMea: unitMeaSelected,
+          product: productName,
+          productId: productSelected,
+          quantity: quantity.toDouble(),
+          expirationDate: productSelectedDate.toIso8601String(),
+          observation: productObservation,
+          recurrent: productIsRecurrent,
+          storeId: storeId,
+          id: id,
+        );
 
-      await _storeService.editItemToStore(request).then((result) async {
-        if (result != null && result.id != null) {
-          if (imagePicked != null) {
-            final imageResponse = await addImageToStoreItem(result.id);
-            response = imageResponse;
+        await _storeService.editItemToStore(request).then((result) async {
+          if (result != null && result.id != null) {
+            if (imagePicked != null) {
+              final imageResponse = await addImageToStoreItem(result.id);
+              response = imageResponse;
+            }
+            response = true;
           }
-          response = true;
-        }
 
-        response = false;
-      }).catchError((error) async {
-        return DioConfig.handleError(error, listAllProducts);
-      });
+          response = false;
+        });
+      }
+      return response;
+    } catch (e) {
+      rethrow;
     }
-    return response;
   }
 }

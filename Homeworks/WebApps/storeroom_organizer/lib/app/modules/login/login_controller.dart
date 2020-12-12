@@ -83,19 +83,21 @@ abstract class _LoginControllerBase with Store {
 
   @action
   Future<bool> submitSignIn() async {
-    if (canSignIn) {
-      final request = LoginRequest(email: signinLogin, password: signinPass);
-      LoginResponse response;
+    try {
+      if (canSignIn) {
+        final request = LoginRequest(email: signinLogin, password: signinPass);
+        LoginResponse response;
 
-      await _authService.login(request).then((result) {
-        response = result;
-      }).catchError((error) async {
-        return DioConfig.handleError(error, submitSignIn);
-      });
+        await _authService.login(request).then((result) {
+          response = result;
+        });
 
-      return response != null ?? false;
+        return response != null ?? false;
+      }
+      return false;
+    } catch (e) {
+      rethrow;
     }
-    return false;
   }
 
   @action

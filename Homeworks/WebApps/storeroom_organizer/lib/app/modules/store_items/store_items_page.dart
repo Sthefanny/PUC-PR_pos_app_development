@@ -20,7 +20,9 @@ import 'store_items_controller.dart';
 
 class StoreItemsPage extends StatefulWidget {
   final int storeId;
-  const StoreItemsPage({Key key, this.storeId}) : super(key: key);
+  final String storeName;
+
+  const StoreItemsPage({Key key, @required this.storeId, @required this.storeName}) : super(key: key);
 
   @override
   _StoreItemsPageState createState() => _StoreItemsPageState();
@@ -39,7 +41,7 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
   Future<void> initialize() async {
     await controller.setUserName();
     await controller.getStoreItems(widget.storeId).catchError((error) async {
-      final errorHandled = await DioConfig.handleError(error, controller.getStoreItems);
+      final errorHandled = await DioConfig.handleError(error);
       if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
         await initialize();
         return;
@@ -61,9 +63,7 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
             decoration: VisualIdentityHelper.buildBackground(),
             child: Column(
               children: [
-                Observer(builder: (_) {
-                  return UserHeaderWidget(userName: controller.userName);
-                }),
+                _buildTop(),
                 Expanded(child: buildStoreItemsList()),
               ],
             ),
@@ -72,6 +72,39 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
       ),
       floatingActionButton: _buildAddButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+
+  Widget _buildTop() {
+    return Row(
+      children: [
+        Expanded(child: _buildTitle()),
+        Observer(builder: (_) {
+          return UserHeaderWidget(userName: controller.userName);
+        }),
+      ],
+    );
+  }
+
+  Widget _buildTitle() {
+    return Container(
+      margin: const EdgeInsets.only(top: 30),
+      child: Row(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(right: 10),
+            child: IconButton(
+              icon: const FaIcon(FontAwesomeIcons.arrowLeft),
+              onPressed: () => Modular.to.pop(),
+              color: Colors.white,
+            ),
+          ),
+          Text(
+            widget.storeName,
+            style: themeData.textTheme.headline5.merge(const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -84,7 +117,7 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
             return const Center(child: CircularProgressIndicator());
           }
           if (controller.storeList.isEmpty) {
-            return const EmptyList(svgImage: 'empty_store_item');
+            return const EmptyList(svgImage: 'empty_store_item', title: 'Sem itens nessa despensa.');
           }
           return Column(
             children: [
@@ -134,7 +167,7 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
   Widget _buildItemCard(StoreItemResponse item) {
     return InkWell(
       onTap: () async {
-        await Modular.to.pushNamed('/storeItemAddEdit', arguments: {'storeId': item.id});
+        await Modular.to.pushNamed('/storeItemAddEdit', arguments: {'storeId': widget.storeId, 'id': item.id});
 
         await controller.getStoreItems(widget.storeId);
       },
@@ -199,9 +232,14 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
         controller.getStoreItems(widget.storeId);
         SnackbarMessages.showSuccess(context: context, description: 'Produto excluído da despensa com sucesso!');
       }
-    }).catchError((error) {
+    }).catchError((error) async {
+      final errorHandled = await DioConfig.handleError(error);
+      if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
+        _loadingController.changeVisibility(false);
+        return _deleteItem(id);
+      }
       _loadingController.changeVisibility(false);
-      SnackbarMessages.showError(context: context, description: error?.message);
+      SnackbarMessages.showError(context: context, description: errorHandled?.failure.toString());
     }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 }

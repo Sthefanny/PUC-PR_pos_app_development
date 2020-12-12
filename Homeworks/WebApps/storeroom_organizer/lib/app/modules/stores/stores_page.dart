@@ -3,8 +3,8 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:storeroom_organizer/app/shared/configs/colors_config.dart';
 
+import '../../shared/configs/colors_config.dart';
 import '../../shared/configs/dio_config.dart';
 import '../../shared/configs/themes_config.dart';
 import '../../shared/helpers/snackbar_messages_helper.dart';
@@ -38,7 +38,7 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
   Future<List<StoreResponse>> getStores() async {
     var response = <StoreResponse>[];
     await controller.getStores().then((value) => response = value).catchError((error) async {
-      final errorHandled = await DioConfig.handleError(error, controller.getStores);
+      final errorHandled = await DioConfig.handleError(error);
       if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
         return getStores();
       }
@@ -160,9 +160,9 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
   Widget _buildItemCard(StoreResponse item) {
     return InkWell(
       onTap: () async {
-        await Modular.to.pushNamed('/storeItemAddEdit', arguments: {'storeId': item.id});
+        await Modular.to.pushNamed('/storeItems', arguments: {'storeId': item.id, 'storeName': item.name});
 
-        await controller.getStores();
+        await refresh();
       },
       child: Stack(
         children: [
@@ -278,13 +278,14 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
     controller.deleteStore(storeId).then((result) {
       _loadingController.changeVisibility(false);
       if (result) {
-        controller.getStores();
+        refresh();
         SnackbarMessages.showSuccess(context: context, description: 'Despensa excluída com sucesso!');
       }
     }).catchError((error) async {
-      final errorHandled = await DioConfig.handleError(error, controller.getStores);
+      final errorHandled = await DioConfig.handleError(error);
       if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
-        return getStores();
+        _loadingController.changeVisibility(false);
+        return _deleteItem(storeId);
       }
       _loadingController.changeVisibility(false);
       SnackbarMessages.showError(context: context, description: errorHandled?.failure.toString());

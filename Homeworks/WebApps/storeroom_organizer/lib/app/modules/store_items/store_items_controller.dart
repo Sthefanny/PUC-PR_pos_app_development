@@ -59,14 +59,16 @@ abstract class _StoreItemsControllerBase with Store {
   }
 
   Future<bool> deleteItem({int storeId, int id}) async {
-    bool response;
+    try {
+      bool response;
 
-    await _service.deleteItemFromStore(storeId: storeId, id: id).then((result) {
-      response = result;
-    }).catchError((error) async {
-      return DioConfig.handleError(error, deleteItem);
-    });
+      await _service.deleteItemFromStore(storeId: storeId, id: id).then((result) {
+        response = result;
+      });
 
-    return response;
+      return response;
+    } catch (e) {
+      rethrow;
+    }
   }
 }
