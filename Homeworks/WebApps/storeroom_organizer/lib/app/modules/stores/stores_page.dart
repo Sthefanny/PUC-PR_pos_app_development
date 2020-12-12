@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
@@ -28,23 +27,19 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
   final LoadingController _loadingController = Modular.get();
   Size _size;
 
-  @override
-  void initState() {
-    super.initState();
-    initialize();
-  }
-
-  Future<void> initialize() async {
-    await controller.setUserName();
-    await controller.getStores().catchError((error) async {
+  Future<List<StoreResponse>> getStores() async {
+    return controller.getStores().catchError((error) async {
       final errorHandled = await DioConfig.handleError(error, controller.getStores);
       if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
-        await initialize();
-        return;
+        return getStores();
       }
       _loadingController.changeVisibility(false);
       SnackbarMessages.showError(context: context, description: errorHandled?.failure.toString());
     });
+  }
+
+  Future<void> refresh() async {
+    setState(() {});
   }
 
   @override
@@ -59,9 +54,12 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
             decoration: VisualIdentityHelper.buildBackground(),
             child: Column(
               children: [
-                Observer(builder: (_) {
-                  return UserHeaderWidget(userName: controller.userName);
-                }),
+                FutureBuilder(
+                    future: controller.setUserName(),
+                    builder: (_, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+                      return UserHeaderWidget(userName: snapshot.data ?? '');
+                    }),
                 Expanded(child: buildStoreList()),
               ],
             ),
@@ -75,31 +73,38 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
 
   Widget buildStoreList() {
     return RefreshIndicator(
-      onRefresh: controller.getStores,
-      child: Observer(
-        builder: (_) {
-          if (controller.storeList == null) {
-            return const Center(child: CircularProgressIndicator());
+      onRefresh: refresh,
+      child: FutureBuilder<List<StoreResponse>>(
+        future: getStores(),
+        builder: (_, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+
+          if (snapshot.hasError) {
+            Future.delayed(Duration.zero, () => SnackbarMessages.showError(context: context, description: snapshot.error));
           }
-          if (controller.storeList.isEmpty) {
+
+          if (snapshot.connectionState == ConnectionState.done && (!snapshot.hasData || snapshot.data.isEmpty)) {
             return const EmptyList(
               svgImage: 'empty_store',
               title: 'Nenhuma despensa encontrada.',
             );
           }
+
+          final items = snapshot.data;
+
           return Column(
             children: [
               Container(
                 margin: const EdgeInsets.only(bottom: 10),
-                child: Text('Despensa', style: themeData.textTheme.headline5.merge(const TextStyle(color: Colors.white))),
+                child: Text('Minhas Despensas', style: themeData.textTheme.headline5.merge(const TextStyle(color: Colors.white))),
               ),
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.only(bottom: 50),
                   physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: controller.storeList.length,
+                  itemCount: items.length,
                   itemBuilder: (_, i) {
-                    final item = controller.storeList[i];
+                    final item = items[i];
                     return _buildSlidableCard(item);
                   },
                 ),
@@ -135,38 +140,80 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
   Widget _buildItemCard(StoreResponse item) {
     return InkWell(
       onTap: () async {
-        await Modular.to.pushNamed('/storeAddEdit', arguments: {'storeId': item.id});
+        await Modular.to.pushNamed('/storeItemAddEdit', arguments: {'storeId': item.id});
 
         await controller.getStores();
       },
-      child: Container(
-        width: _size.width,
-        child: Card(
-          color: Colors.white,
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildImage(),
-                Expanded(child: Text(item.name, textAlign: TextAlign.center, style: themeData.textTheme.bodyText2)),
-                Text(item.totalItems.toString(), style: themeData.textTheme.bodyText2),
-              ],
+      child: Stack(
+        children: [
+          Container(
+            width: _size.width,
+            height: 100,
+            child: Card(
+              color: Colors.white,
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildImage(),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Text(item.name, textAlign: TextAlign.center, style: themeData.textTheme.bodyText2),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(getItemText(item.totalItems), style: themeData.textTheme.bodyText2),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
+          Visibility(
+            visible: item.expiredItems,
+            child: const Positioned(
+              top: -2,
+              right: -2,
+              child: Icon(
+                Icons.brightness_1,
+                size: 20,
+                color: Colors.red,
+              ),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  String getItemText(int totalItems) {
+    if (totalItems <= 0) {
+      return 'Nenhum item';
+    } else if (totalItems == 1) {
+      return '$totalItems item';
+    }
+    return '$totalItems itens';
   }
 
   Widget _buildImage() {
     return SvgPicture.asset(
       'assets/images/store.svg',
-      height: 80,
+      width: 100,
       fit: BoxFit.cover,
     );
   }
@@ -176,7 +223,8 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
       onPressed: () async {
         await Modular.to.pushNamed('/storeAddEdit');
 
-        await controller.getStores();
+        await getStores();
+        await refresh();
       },
       child: const FaIcon(FontAwesomeIcons.plus),
     );
@@ -187,15 +235,22 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
 
     _loadingController.changeVisibility(true);
 
-    controller.deleteItem(storeId).then((result) {
+    controller.deleteStore(storeId).then((result) {
       _loadingController.changeVisibility(false);
       if (result) {
         controller.getStores();
-        SnackbarMessages.showSuccess(context: context, description: 'Produto excluído da despensa com sucesso!');
+        SnackbarMessages.showSuccess(context: context, description: 'Despensa excluída com sucesso!');
       }
-    }).catchError((error) {
+    }).catchError((error) async {
+      final errorHandled = await DioConfig.handleError(error, controller.getStores);
+      if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
+        return getStores();
+      }
       _loadingController.changeVisibility(false);
-      SnackbarMessages.showError(context: context, description: error?.message);
-    }).whenComplete(() => _loadingController.changeVisibility(false));
+      SnackbarMessages.showError(context: context, description: errorHandled?.failure.toString());
+    }).whenComplete(() {
+      refresh();
+      _loadingController.changeVisibility(false);
+    });
   }
 }

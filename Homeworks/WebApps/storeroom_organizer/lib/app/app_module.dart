@@ -8,6 +8,7 @@ import 'modules/loading/loading_controller.dart';
 import 'modules/login/login_module.dart';
 import 'modules/splash/splash_module.dart';
 import 'modules/store_add_edit/store_add_edit_module.dart';
+import 'modules/store_item_add_edit/store_item_add_edit_module.dart';
 import 'modules/store_items/store_items_module.dart';
 import 'modules/stores/stores_module.dart';
 import 'shared/configs/auth_config.dart';
@@ -36,6 +37,7 @@ class AppModule extends MainModule {
         ModularRouter('/stores', module: StoresModule()),
         ModularRouter('/storeItems', module: StoreItemsModule()),
         ModularRouter('/storeAddEdit', module: StoreAddEditModule()),
+        ModularRouter('/storeItemAddEdit', module: StoreItemAddEditModule()),
       ];
 
   @override

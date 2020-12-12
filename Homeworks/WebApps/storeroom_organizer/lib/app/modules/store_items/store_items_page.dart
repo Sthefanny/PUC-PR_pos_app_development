@@ -134,7 +134,7 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
   Widget _buildItemCard(StoreItemResponse item) {
     return InkWell(
       onTap: () async {
-        await Modular.to.pushNamed('/storeAddEdit', arguments: {'storeId': item.id});
+        await Modular.to.pushNamed('/storeItemAddEdit', arguments: {'storeId': item.id});
 
         await controller.getStoreItems(widget.storeId);
       },
@@ -180,7 +180,7 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
   Widget _buildAddButton() {
     return FloatingActionButton(
       onPressed: () async {
-        await Modular.to.pushNamed('/storeAddEdit');
+        await Modular.to.pushNamed('/storeItemAddEdit');
 
         await controller.getStoreItems(widget.storeId);
       },
