@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:storeroom_organizer/app/shared/configs/themes_config.dart';
+import '../configs/themes_config.dart';
 
 class FormHelper {
   static InputDecoration getInputDecoration({@required String hintText, Widget suffixIcon}) {
     return InputDecoration(
-      contentPadding: EdgeInsets.all(15),
+      contentPadding: const EdgeInsets.all(15),
       filled: true,
       fillColor: Colors.white,
       enabledBorder: _getOutlineInputBorder(),
@@ -13,13 +13,13 @@ class FormHelper {
       focusedErrorBorder: _getOutlineInputBorder(),
       hintText: hintText,
       hintStyle: themeData.textTheme.bodyText1,
-      suffixIcon: suffixIcon ?? null,
+      suffixIcon: suffixIcon,
     );
   }
 
   static OutlineInputBorder _getOutlineInputBorder() {
     return OutlineInputBorder(
-      borderSide: BorderSide(color: Colors.black.withOpacity(.12), width: 1),
+      borderSide: BorderSide(color: Colors.black.withOpacity(.12)),
       borderRadius: BorderRadius.circular(10),
     );
   }

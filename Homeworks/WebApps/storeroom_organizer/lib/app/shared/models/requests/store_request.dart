@@ -1,16 +1,16 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'store_response.g.dart';
+part 'store_request.g.dart';
 
 @JsonSerializable()
-class StoreResponse {
+class StoreRequest {
   final int id;
   final String name;
   final String description;
   final int totalItems;
   final bool expiredItems;
 
-  StoreResponse({
+  StoreRequest({
     this.id,
     this.name,
     this.description,
@@ -18,6 +18,6 @@ class StoreResponse {
     this.expiredItems,
   });
 
-  factory StoreResponse.fromJson(Map<String, dynamic> json) => _$StoreResponseFromJson(json);
-  Map<String, dynamic> toJson() => _$StoreResponseToJson(this);
+  factory StoreRequest.fromJson(Map<String, dynamic> json) => _$StoreRequestFromJson(json);
+  Map<String, dynamic> toJson() => _$StoreRequestToJson(this);
 }

@@ -7,11 +7,12 @@ import '../../shared/configs/dio_config.dart';
 import '../../shared/configs/urls_config.dart';
 import '../../shared/extensions/string_extensions.dart';
 import '../../shared/models/enums/unit_mea_enum.dart';
+import '../../shared/models/requests/store_item_request.dart';
 import '../../shared/models/responses/product_response.dart';
-import '../../shared/models/responses/store_response.dart';
+import '../../shared/models/responses/store_item_response.dart';
 import '../../shared/models/unit_mea_model.dart';
 import '../../shared/services/product_service.dart';
-import '../../shared/services/store_service.dart';
+import '../../shared/services/store_items_service.dart';
 
 part 'store_add_edit_controller.g.dart';
 
@@ -19,7 +20,7 @@ part 'store_add_edit_controller.g.dart';
 class StoreAddEditController = _StoreAddEditControllerBase with _$StoreAddEditController;
 
 abstract class _StoreAddEditControllerBase with Store {
-  final StoreService _storeService;
+  final StoreItemsService _storeService;
   final ProductService _productService;
 
   _StoreAddEditControllerBase(this._storeService, this._productService);
@@ -46,28 +47,28 @@ abstract class _StoreAddEditControllerBase with Store {
   File imagePicked;
 
   @action
-  changeId(int value) => storeId = value;
+  int changeId(int value) => storeId = value;
   @action
-  changeProductSelected(int value) => productSelected = value;
+  int changeProductSelected(int value) => productSelected = value;
   @action
-  changeProductName(String value) => productName = value;
+  String changeProductName(String value) => productName = value;
   @action
-  changeUnitMeaSelected(int value) => unitMeaSelected = value;
+  int changeUnitMeaSelected(int value) => unitMeaSelected = value;
   @action
-  changeQuantity(int value) => quantity = value;
+  int changeQuantity(int value) => quantity = value;
   @action
-  changeImageUrl(String value) => imageUrl = value;
+  String changeImageUrl(String value) => imageUrl = value;
   @action
-  increaseQuantity() => quantity = quantity + 1;
+  void increaseQuantity() => quantity = quantity + 1;
   @action
-  decreaseQuantity() {
+  void decreaseQuantity() {
     if (quantity > 0) quantity = quantity - 1;
   }
 
   @action
-  changeProductNameIsVisible(bool value) => productNameIsVisible = value;
+  bool changeProductNameIsVisible(bool value) => productNameIsVisible = value;
   @action
-  changeImagePicked(File value) => imagePicked = value;
+  File changeImagePicked(File value) => imagePicked = value;
 
   @computed
   bool get hasProduct => productSelected != null && productSelected >= 0 || productName.isNotNullOrEmpty();
@@ -78,41 +79,48 @@ abstract class _StoreAddEditControllerBase with Store {
   Future<void> init() async {
     await listAllProducts();
     await listAllUnitMea();
-    if (storeId != null) getStoreItemInfo();
+    if (storeId != null) await getStoreItemInfo();
   }
 
   @action
   Future<void> listAllProducts() async {
-    try {
-      var response = await _productService.listAllProducts();
-      productList.clear();
-      productList.addAll(response);
-    } catch (e) {
-      throw e.toString();
-    }
+    await _productService.listAllProducts().then((result) {
+      if (result != null) {
+        productList
+          ..clear()
+          ..addAll(result);
+      }
+    }).catchError((error) async {
+      return DioConfig.handleError(error, listAllProducts);
+    });
   }
 
   @action
   Future<void> listAllUnitMea() async {
     try {
-      unitMeaList.clear();
-      unitMeaList.add(UnitMeaModel(id: 0, name: unitMeaEnumToStr(UnitMeaEnum.unit)));
-      unitMeaList.add(UnitMeaModel(id: 1, name: unitMeaEnumToStr(UnitMeaEnum.weight)));
+      unitMeaList
+        ..clear()
+        ..add(UnitMeaModel(id: 0, name: unitMeaEnumToStr(UnitMeaEnum.unit)))
+        ..add(UnitMeaModel(id: 1, name: unitMeaEnumToStr(UnitMeaEnum.weight)));
     } catch (e) {
-      throw e.toString();
+      throw Exception(e.toString());
     }
   }
 
   Future<bool> addItemToStore() async {
     if (canAddEditStore) {
-      var request = StoreResponse(unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
-      StoreResponse response;
+      final request = StoreItemRequest(unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
+      StoreItemResponse response;
 
-      await _storeService.addItemToStore(request).then((result) => response = result).catchError(DioConfig.handleError);
+      await _storeService.addItemToStore(request).then((result) {
+        response = result;
+      }).catchError((error) async {
+        return DioConfig.handleError(error, addItemToStore);
+      });
 
       if (response != null && response.id != null) {
         if (imagePicked != null) {
-          var imageResponse = await addImageToStoreItem(response.id);
+          final imageResponse = await addImageToStoreItem(response.id);
           return imageResponse;
         }
         return true;
@@ -125,9 +133,13 @@ abstract class _StoreAddEditControllerBase with Store {
 
   Future<bool> addImageToStoreItem(int storeId) async {
     if (storeId != null && imagePicked != null) {
-      StoreResponse response;
+      StoreItemResponse response;
 
-      await _storeService.addImageToItem(storeId, imagePicked).then((result) => response = result).catchError(DioConfig.handleError);
+      await _storeService.addImageToItem(storeId, imagePicked).then((result) {
+        response = result;
+      }).catchError((error) async {
+        return DioConfig.handleError(error, () => addImageToStoreItem(storeId));
+      });
 
       if (response != null && response.imageUrl != null) {
         return true;
@@ -139,38 +151,39 @@ abstract class _StoreAddEditControllerBase with Store {
   }
 
   Future<void> getStoreItemInfo() async {
-    StoreResponse response;
-
-    await _storeService.getItemFromStore(storeId).then((result) => response = result).catchError(DioConfig.handleError);
-
-    if (response != null && response.id != null) {
-      changeProductSelected(response.productId);
-      changeUnitMeaSelected(response.unitMea);
-      changeQuantity(response.quantity.toInt());
-      if (response.imageUrl.isNotNullOrEmpty()) changeImageUrl('${UrlConfig.baseUrl}${response.imageUrl}');
-      return;
-    }
-
-    throw Exception('Ocorreu um erro ao tentar carregar os dados.');
+    await _storeService.getItemFromStore(storeId).then((result) {
+      if (result != null && result.id != null) {
+        changeProductSelected(result.productId);
+        changeUnitMeaSelected(result.unitMea);
+        changeQuantity(result.quantity.toInt());
+        if (result.imageUrl.isNotNullOrEmpty()) changeImageUrl('${UrlConfig.baseUrl}${result.imageUrl}');
+        return;
+      }
+    }).catchError((error) async {
+      return DioConfig.handleError(error, listAllProducts);
+    });
   }
 
   Future<bool> editItemFromStore() async {
+    bool response = false;
+
     if (canAddEditStore) {
-      var request = StoreResponse(id: storeId, unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
-      StoreResponse response;
+      final request = StoreItemRequest(unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
 
-      await _storeService.editItemToStore(request).then((result) => response = result).catchError(DioConfig.handleError);
-
-      if (response != null && response.id != null) {
-        if (imagePicked != null) {
-          var imageResponse = await addImageToStoreItem(response.id);
-          return imageResponse;
+      await _storeService.editItemToStore(request).then((result) async {
+        if (result != null && result.id != null) {
+          if (imagePicked != null) {
+            final imageResponse = await addImageToStoreItem(result.id);
+            response = imageResponse;
+          }
+          response = true;
         }
-        return true;
-      }
 
-      return false;
+        response = false;
+      }).catchError((error) async {
+        return DioConfig.handleError(error, listAllProducts);
+      });
     }
-    return false;
+    return response;
   }
 }

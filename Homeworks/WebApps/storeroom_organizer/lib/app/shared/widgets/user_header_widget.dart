@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../../shared/configs/colors_config.dart';
-import '../../../shared/configs/themes_config.dart';
-import '../../../shared/helpers/snackbar_messages_helper.dart';
-import '../../../shared/services/auth_service.dart';
-import '../../loading/loading_controller.dart';
+import '../../modules/loading/loading_controller.dart';
+import '../configs/colors_config.dart';
+import '../configs/themes_config.dart';
+import '../helpers/snackbar_messages_helper.dart';
+import '../services/auth_service.dart';
 
 class UserHeaderWidget extends StatelessWidget {
   final String userName;
@@ -24,7 +24,7 @@ class UserHeaderWidget extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            FaIcon(
+            const FaIcon(
               FontAwesomeIcons.solidUserCircle,
               color: Colors.white,
             ),
@@ -32,7 +32,7 @@ class UserHeaderWidget extends StatelessWidget {
               margin: const EdgeInsets.only(left: 5, right: 10),
               child: Text(
                 userName ?? '',
-                style: themeData.textTheme.button.merge(TextStyle(color: Colors.white)),
+                style: themeData.textTheme.button.merge(const TextStyle(color: Colors.white)),
               ),
             ),
           ],
@@ -57,7 +57,7 @@ class UserHeaderWidget extends StatelessWidget {
                     showLogoutDialog(context);
                   },
                   color: ColorsConfig.button,
-                  child: Text('Sair', style: themeData.textTheme.button.merge(TextStyle(color: Colors.white))),
+                  child: Text('Sair', style: themeData.textTheme.button.merge(const TextStyle(color: Colors.white))),
                 ),
               ],
             ),
@@ -67,7 +67,7 @@ class UserHeaderWidget extends StatelessWidget {
                 onPressed: Modular.to.pop,
                 child: Text(
                   'Cancelar',
-                  style: themeData.textTheme.button.merge(TextStyle(color: ColorsConfig.purpleDark)),
+                  style: themeData.textTheme.button.merge(const TextStyle(color: ColorsConfig.purpleDark)),
                 )),
           ],
         );
@@ -85,7 +85,7 @@ class UserHeaderWidget extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: Modular.to.pop,
-              child: Text('Cancelar', style: themeData.textTheme.button.merge(TextStyle(color: ColorsConfig.purpleDark))),
+              child: Text('Cancelar', style: themeData.textTheme.button.merge(const TextStyle(color: ColorsConfig.purpleDark))),
             ),
             TextButton(
               onPressed: () {
@@ -95,7 +95,7 @@ class UserHeaderWidget extends StatelessWidget {
                   _service.logout().then((response) {
                     if (response) {
                       _loadingController.changeVisibility(false);
-                      Modular.to.pushNamedAndRemoveUntil('/login', (route) => route.isFirst ? true : false);
+                      Modular.to.pushNamedAndRemoveUntil('/login', (route) => route.isFirst);
                     } else {
                       _loadingController.changeVisibility(false);
                       SnackbarMessages.showError(context: context, description: 'Erro ao deslogar');
@@ -106,7 +106,7 @@ class UserHeaderWidget extends StatelessWidget {
                   SnackbarMessages.showError(context: context, description: 'Erro ao deslogar');
                 }
               },
-              child: Text('Sair', style: themeData.textTheme.button.merge(TextStyle(color: ColorsConfig.purpleDark))),
+              child: Text('Sair', style: themeData.textTheme.button.merge(const TextStyle(color: ColorsConfig.purpleDark))),
             ),
           ],
         );

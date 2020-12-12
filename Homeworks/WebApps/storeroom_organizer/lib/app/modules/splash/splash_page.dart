@@ -33,7 +33,7 @@ class _SplashPageState extends ModularState<SplashPage, SplashController> {
     _disposer = reaction(
       (_) => controller.tokenIsValid,
       (tokenIsValid) {
-        tokenIsValid ? Modular.to.pushReplacementNamed('/home') : Modular.to.pushReplacementNamed('/login');
+        tokenIsValid ? Modular.to.pushReplacementNamed('/stores') : Modular.to.pushReplacementNamed('/login');
       },
     );
   }
@@ -42,7 +42,7 @@ class _SplashPageState extends ModularState<SplashPage, SplashController> {
   Widget build(BuildContext context) {
     return Container(
       decoration: VisualIdentityHelper.buildBackground(),
-      child: Center(child: CircularProgressIndicator()),
+      child: const Center(child: CircularProgressIndicator()),
     );
   }
 }
