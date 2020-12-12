@@ -1,8 +1,7 @@
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
-import 'package:storeroom_organizer/app/shared/models/requests/store_request.dart';
 
-import '../../shared/configs/dio_config.dart';
+import '../../shared/models/requests/store_request.dart';
 import '../../shared/models/responses/store_response.dart';
 import '../../shared/services/stores_service.dart';
 import '../../shared/utils/user_utils.dart';

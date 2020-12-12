@@ -3,6 +3,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:storeroom_organizer/app/shared/configs/colors_config.dart';
 
 import '../../shared/configs/dio_config.dart';
 import '../../shared/configs/themes_config.dart';
@@ -25,10 +26,18 @@ class StoresPage extends StatefulWidget {
 
 class _StoresPageState extends ModularState<StoresPage, StoresController> {
   final LoadingController _loadingController = Modular.get();
+  Future<List<StoreResponse>> _storesResponse;
   Size _size;
 
+  @override
+  void initState() {
+    super.initState();
+    _storesResponse = getStores();
+  }
+
   Future<List<StoreResponse>> getStores() async {
-    return controller.getStores().catchError((error) async {
+    var response = <StoreResponse>[];
+    await controller.getStores().then((value) => response = value).catchError((error) async {
       final errorHandled = await DioConfig.handleError(error, controller.getStores);
       if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
         return getStores();
@@ -36,9 +45,11 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
       _loadingController.changeVisibility(false);
       SnackbarMessages.showError(context: context, description: errorHandled?.failure.toString());
     });
+    return response;
   }
 
   Future<void> refresh() async {
+    _storesResponse = getStores();
     setState(() {});
   }
 
@@ -75,7 +86,7 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
     return RefreshIndicator(
       onRefresh: refresh,
       child: FutureBuilder<List<StoreResponse>>(
-        future: getStores(),
+        future: _storesResponse,
         builder: (_, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
 
@@ -123,10 +134,19 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: IconSlideAction(
+            caption: 'Editar',
+            color: Colors.yellow,
+            iconWidget: const FaIcon(FontAwesomeIcons.pen),
+            onTap: () => _editItem(item.id),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: IconSlideAction(
             caption: 'Deletar',
             color: Colors.red,
             iconWidget: const FaIcon(FontAwesomeIcons.trash, color: Colors.white),
-            onTap: () => _deleteItem(item.id),
+            onTap: () => _showDeleteDialog(storeId: item.id, storeName: item.name),
           ),
         ),
       ],
@@ -223,10 +243,30 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
       onPressed: () async {
         await Modular.to.pushNamed('/storeAddEdit');
 
-        await getStores();
         await refresh();
       },
       child: const FaIcon(FontAwesomeIcons.plus),
+    );
+  }
+
+  void _showDeleteDialog({@required int storeId, @required String storeName}) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text(storeName),
+          content: Text('Tem certeza que quer excluir essa despensa? Essa é uma ação irreversível.', style: themeData.textTheme.bodyText2),
+          actions: [
+            TextButton(onPressed: () => Modular.to.pop(), child: Text('Cancelar', style: themeData.textTheme.button.merge(const TextStyle(color: ColorsConfig.button)))),
+            TextButton(
+                onPressed: () {
+                  Modular.to.pop();
+                  _deleteItem(storeId);
+                },
+                child: Text('Excluir', style: themeData.textTheme.button.merge(const TextStyle(color: ColorsConfig.button)))),
+          ],
+        );
+      },
     );
   }
 
@@ -252,5 +292,11 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
       refresh();
       _loadingController.changeVisibility(false);
     });
+  }
+
+  Future<void> _editItem(int storeId) async {
+    await Modular.to.pushNamed('/storeAddEdit', arguments: {'storeId': storeId});
+
+    await refresh();
   }
 }

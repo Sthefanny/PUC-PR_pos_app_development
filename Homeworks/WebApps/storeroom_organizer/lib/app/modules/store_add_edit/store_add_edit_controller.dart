@@ -1,13 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../shared/models/requests/store_request.dart';
-import '../../shared/models/responses/product_response.dart';
-import '../../shared/models/unit_mea_model.dart';
-import '../../shared/services/product_service.dart';
-import '../../shared/services/store_items_service.dart';
+import '../../shared/models/responses/store_response.dart';
 import '../../shared/services/stores_service.dart';
 
 part 'store_add_edit_controller.g.dart';
@@ -30,7 +25,7 @@ abstract class _StoreAddEditControllerBase with Store {
   String changeNewStoreDescription(String value) => newStoreDescription = value;
 
   @computed
-  bool get canAddNewStore => newStoreName != null && newStoreName.isNotEmpty;
+  bool get canAddEditNewStore => newStoreName != null && newStoreName.isNotEmpty;
 
   Future<bool> createStore() async {
     bool response = false;
@@ -41,6 +36,32 @@ abstract class _StoreAddEditControllerBase with Store {
       await _service.createStore(request).then((result) {
         response = result != null && result.id != null;
       });
+    } catch (e) {
+      rethrow;
+    }
+    return response;
+  }
+
+  Future<bool> editStore(int storeId) async {
+    bool response = false;
+
+    try {
+      final request = StoreRequest(id: storeId, name: newStoreName, description: newStoreDescription);
+
+      await _service.editStore(request).then((result) {
+        response = result != null && result.id != null;
+      });
+    } catch (e) {
+      rethrow;
+    }
+    return response;
+  }
+
+  Future<StoreResponse> getStoreData(int storeId) async {
+    StoreResponse response;
+
+    try {
+      await _service.getStore(storeId).then((result) => response = result);
     } catch (e) {
       rethrow;
     }

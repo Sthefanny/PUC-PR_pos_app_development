@@ -7,6 +7,7 @@ import '../../shared/configs/colors_config.dart';
 import '../../shared/configs/themes_config.dart';
 import '../../shared/helpers/snackbar_messages_helper.dart';
 import '../../shared/helpers/visual_identity_helper.dart';
+import '../../shared/models/responses/store_response.dart';
 import '../../shared/widgets/text_field_default.dart';
 import '../loading/loading_controller.dart';
 import '../loading/loading_widget.dart';
@@ -23,7 +24,22 @@ class StoreAddEditPage extends StatefulWidget {
 
 class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEditController> {
   final LoadingController _loadingController = Modular.get();
+  TextEditingController nameEditingController = TextEditingController();
+  TextEditingController descriptionEditingController = TextEditingController();
+  Future<StoreResponse> _storeResponse;
   Size _size;
+
+  @override
+  void initState() {
+    super.initState();
+    getStoreData();
+  }
+
+  void getStoreData() {
+    if (widget.storeId != null) {
+      _storeResponse = controller.getStoreData(widget.storeId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,15 +87,36 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
   }
 
   Widget _buildBody() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-      child: Column(
-        children: [
-          _buildNameField(),
-          _buildDescriptionField(),
-        ],
-      ),
-    );
+    return FutureBuilder<StoreResponse>(
+        future: _storeResponse,
+        builder: (_, snapshot) {
+          if (snapshot.hasError) {
+            Future.delayed(Duration.zero, () => SnackbarMessages.showError(context: context, description: snapshot.error));
+          }
+
+          if (snapshot.hasData) {
+            final item = snapshot.data;
+            Future.delayed(Duration.zero, () {
+              controller
+                ..changeNewStoreName(item.name)
+                ..changeNewStoreDescription(item.description);
+              nameEditingController.text = item.name;
+              descriptionEditingController.text = item.description;
+              nameEditingController.selection = TextSelection.fromPosition(TextPosition(offset: nameEditingController.text.length));
+              descriptionEditingController.selection = TextSelection.fromPosition(TextPosition(offset: descriptionEditingController.text.length));
+            });
+          }
+
+          return Container(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            child: Column(
+              children: [
+                _buildNameField(),
+                _buildDescriptionField(),
+              ],
+            ),
+          );
+        });
   }
 
   Widget _buildNameField() {
@@ -91,6 +128,7 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
         onChanged: controller.changeNewStoreName,
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.next,
+        textEditingController: nameEditingController,
       ),
     );
   }
@@ -105,6 +143,7 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
         keyboardType: TextInputType.multiline,
         textInputAction: TextInputAction.newline,
         maxLines: 6,
+        textEditingController: descriptionEditingController,
       ),
     );
   }
@@ -124,9 +163,13 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
             disabledColor: ColorsConfig.disabledButton,
             textColor: Colors.white,
             disabledTextColor: Colors.grey,
-            onPressed: controller.canAddNewStore ? _createStore : null,
+            onPressed: controller.canAddEditNewStore
+                ? widget.storeId != null
+                    ? _editStore
+                    : _createStore
+                : null,
             child: Text(
-              'Criar'.toUpperCase(),
+              widget.storeId != null ? 'Atualizar'.toUpperCase() : 'Criar'.toUpperCase(),
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           );
@@ -145,6 +188,23 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
       if (result) {
         Modular.to.pop();
         SnackbarMessages.showSuccess(context: context, description: 'Despensa criada com sucesso!');
+      }
+    }).catchError((error) {
+      _loadingController.changeVisibility(false);
+      SnackbarMessages.showError(context: context, description: error?.message);
+    }).whenComplete(() => _loadingController.changeVisibility(false));
+  }
+
+  void _editStore() {
+    FocusScope.of(context).requestFocus(FocusNode());
+
+    _loadingController.changeVisibility(true);
+
+    controller.editStore(widget.storeId).then((result) {
+      _loadingController.changeVisibility(false);
+      if (result) {
+        Modular.to.pop();
+        SnackbarMessages.showSuccess(context: context, description: 'Despensa atualizada com sucesso!');
       }
     }).catchError((error) {
       _loadingController.changeVisibility(false);
