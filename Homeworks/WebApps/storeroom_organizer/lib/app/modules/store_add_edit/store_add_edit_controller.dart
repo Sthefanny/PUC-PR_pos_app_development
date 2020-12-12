@@ -7,11 +7,12 @@ import '../../shared/configs/dio_config.dart';
 import '../../shared/configs/urls_config.dart';
 import '../../shared/extensions/string_extensions.dart';
 import '../../shared/models/enums/unit_mea_enum.dart';
+import '../../shared/models/requests/store_item_request.dart';
 import '../../shared/models/responses/product_response.dart';
-import '../../shared/models/responses/store_response.dart';
+import '../../shared/models/responses/store_item_response.dart';
 import '../../shared/models/unit_mea_model.dart';
 import '../../shared/services/product_service.dart';
-import '../../shared/services/store_service.dart';
+import '../../shared/services/store_items_service.dart';
 
 part 'store_add_edit_controller.g.dart';
 
@@ -19,7 +20,7 @@ part 'store_add_edit_controller.g.dart';
 class StoreAddEditController = _StoreAddEditControllerBase with _$StoreAddEditController;
 
 abstract class _StoreAddEditControllerBase with Store {
-  final StoreService _storeService;
+  final StoreItemsService _storeService;
   final ProductService _productService;
 
   _StoreAddEditControllerBase(this._storeService, this._productService);
@@ -108,8 +109,8 @@ abstract class _StoreAddEditControllerBase with Store {
 
   Future<bool> addItemToStore() async {
     if (canAddEditStore) {
-      final request = StoreResponse(unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
-      StoreResponse response;
+      final request = StoreItemRequest(unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
+      StoreItemResponse response;
 
       await _storeService.addItemToStore(request).then((result) {
         response = result;
@@ -132,7 +133,7 @@ abstract class _StoreAddEditControllerBase with Store {
 
   Future<bool> addImageToStoreItem(int storeId) async {
     if (storeId != null && imagePicked != null) {
-      StoreResponse response;
+      StoreItemResponse response;
 
       await _storeService.addImageToItem(storeId, imagePicked).then((result) {
         response = result;
@@ -167,7 +168,7 @@ abstract class _StoreAddEditControllerBase with Store {
     bool response = false;
 
     if (canAddEditStore) {
-      final request = StoreResponse(id: storeId, unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
+      final request = StoreItemRequest(unitMea: unitMeaSelected, product: productName, productId: productSelected, quantity: quantity.toDouble());
 
       await _storeService.editItemToStore(request).then((result) async {
         if (result != null && result.id != null) {

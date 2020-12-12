@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:storeroom_organizer/app/shared/configs/dio_config.dart';
-import 'package:storeroom_organizer/app/shared/models/default_response.dart';
 
 import '../../../shared/configs/colors_config.dart';
+import '../../../shared/configs/dio_config.dart';
 import '../../../shared/helpers/snackbar_messages_helper.dart';
 import '../../../shared/widgets/text_field_default.dart';
 import '../../loading/loading_controller.dart';

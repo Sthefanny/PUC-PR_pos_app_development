@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../../shared/configs/colors_config.dart';
-import '../../../shared/configs/themes_config.dart';
-import '../../../shared/helpers/snackbar_messages_helper.dart';
-import '../../../shared/services/auth_service.dart';
-import '../../loading/loading_controller.dart';
+import '../../modules/loading/loading_controller.dart';
+import '../configs/colors_config.dart';
+import '../configs/themes_config.dart';
+import '../helpers/snackbar_messages_helper.dart';
+import '../services/auth_service.dart';
 
 class UserHeaderWidget extends StatelessWidget {
   final String userName;

@@ -131,7 +131,7 @@ class _SignInState extends ModularState<SignIn, LoginController> {
     controller.submitSignIn().then((result) {
       _loadingController.changeVisibility(false);
       if (result) {
-        Modular.to.pushReplacementNamed('/home');
+        Modular.to.pushReplacementNamed('/storeItems');
       }
     }).catchError((error) {
       _loadingController.changeVisibility(false);

@@ -2,16 +2,17 @@ import 'dart:io';
 
 import 'package:flutter_modular/flutter_modular.dart';
 
-import '../models/responses/store_response.dart';
+import '../models/requests/store_item_request.dart';
+import '../models/responses/store_item_response.dart';
 import '../rest_client.dart';
 
-class StoreService extends Disposable {
+class StoreItemsService extends Disposable {
   final RestClient _repository;
 
-  StoreService(this._repository);
+  StoreItemsService(this._repository);
 
-  Future<List<StoreResponse>> listAllItemsFromStore() async {
-    final response = await _repository.listStoreItems();
+  Future<List<StoreItemResponse>> listAllItemsFromStore(int storeId) async {
+    final response = await _repository.listStoreItems(storeId);
 
     if (response != null) {
       return response;
@@ -20,7 +21,7 @@ class StoreService extends Disposable {
     throw Exception('Ocorreu um erro ao tentar listar os itens da despensa.');
   }
 
-  Future<StoreResponse> getItemFromStore(int id) async {
+  Future<StoreItemResponse> getItemFromStore(int id) async {
     final response = await _repository.getItemFromStore(id);
 
     if (response != null) {
@@ -30,8 +31,8 @@ class StoreService extends Disposable {
     throw Exception('Ocorreu um erro ao tentar retornar o item da despensa.');
   }
 
-  Future<bool> deleteItemFromStore(int id) async {
-    final response = await _repository.deleteItemFromStore(id);
+  Future<bool> deleteItemFromStore({int storeId, int id}) async {
+    final response = await _repository.deleteItemFromStore(storeId, id);
 
     if (response.response.statusCode >= 200 && response.response.statusCode <= 300) {
       return true;
@@ -40,7 +41,7 @@ class StoreService extends Disposable {
     return false;
   }
 
-  Future<StoreResponse> addItemToStore(StoreResponse request) async {
+  Future<StoreItemResponse> addItemToStore(StoreItemRequest request) async {
     final response = await _repository.addItemToStore(request);
 
     if (response != null) {
@@ -50,7 +51,7 @@ class StoreService extends Disposable {
     throw Exception('Ocorreu um erro ao tentar adicionar o item na despensa.');
   }
 
-  Future<StoreResponse> editItemToStore(StoreResponse request) async {
+  Future<StoreItemResponse> editItemToStore(StoreItemRequest request) async {
     final response = await _repository.editItemToStore(request);
 
     if (response != null) {
@@ -60,7 +61,7 @@ class StoreService extends Disposable {
     throw Exception('Ocorreu um erro ao tentar editar o item na despensa.');
   }
 
-  Future<StoreResponse> addImageToItem(int id, File file) async {
+  Future<StoreItemResponse> addImageToItem(int id, File file) async {
     final response = await _repository.addImageToItem(id, file);
 
     if (response != null) {

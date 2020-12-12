@@ -18,7 +18,7 @@ class AuthConfig {
           onRequest: (options) async {
             final token = await _secureStorageRepository.getItem(ConfigurationEnum.token.toStr);
             if (token != null && token.isNotEmpty) {
-              // print('Token: $token');
+              print('Token: $token');
               options.headers.addAll({'Authorization': token});
             }
             return options;
