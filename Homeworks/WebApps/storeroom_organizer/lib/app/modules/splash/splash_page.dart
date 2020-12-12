@@ -3,6 +3,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../shared/helpers/visual_identity_helper.dart';
+import '../../shared/widgets/progress_indicator_widget.dart';
 import 'splash_controller.dart';
 
 class SplashPage extends StatefulWidget {
@@ -42,7 +43,7 @@ class _SplashPageState extends ModularState<SplashPage, SplashController> {
   Widget build(BuildContext context) {
     return Container(
       decoration: VisualIdentityHelper.buildBackground(),
-      child: const Center(child: CircularProgressIndicator()),
+      child: ProgressIndicatorWidget(),
     );
   }
 }

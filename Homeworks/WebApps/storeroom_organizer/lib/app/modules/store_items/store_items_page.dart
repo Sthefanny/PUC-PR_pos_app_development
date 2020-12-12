@@ -4,6 +4,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:storeroom_organizer/app/shared/configs/colors_config.dart';
 
 import '../../shared/configs/dio_config.dart';
 import '../../shared/configs/themes_config.dart';
@@ -12,7 +13,9 @@ import '../../shared/extensions/string_extensions.dart';
 import '../../shared/helpers/snackbar_messages_helper.dart';
 import '../../shared/helpers/visual_identity_helper.dart';
 import '../../shared/models/responses/store_item_response.dart';
+import '../../shared/utils/date_utils.dart';
 import '../../shared/widgets/empty_list.dart';
+import '../../shared/widgets/progress_indicator_widget.dart';
 import '../../shared/widgets/user_header_widget.dart';
 import '../loading/loading_controller.dart';
 import '../loading/loading_widget.dart';
@@ -39,7 +42,6 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
   }
 
   Future<void> initialize() async {
-    await controller.setUserName();
     await controller.getStoreItems(widget.storeId).catchError((error) async {
       final errorHandled = await DioConfig.handleError(error);
       if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
@@ -79,9 +81,7 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
     return Row(
       children: [
         Expanded(child: _buildTitle()),
-        Observer(builder: (_) {
-          return UserHeaderWidget(userName: controller.userName);
-        }),
+        UserHeaderWidget(parentContext: context),
       ],
     );
   }
@@ -114,7 +114,7 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
       child: Observer(
         builder: (_) {
           if (controller.storeList == null) {
-            return const Center(child: CircularProgressIndicator());
+            return ProgressIndicatorWidget();
           }
           if (controller.storeList.isEmpty) {
             return const EmptyList(svgImage: 'empty_store_item', title: 'Sem itens nessa despensa.');
@@ -181,12 +181,22 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
               children: [
-                _buildImage(item.imageUrl),
-                Expanded(child: Text(item.product, textAlign: TextAlign.center, style: themeData.textTheme.bodyText2)),
-                Text('${item.quantity.toString()} ${controller.getUnitMeaName(item.unitMea)}', style: themeData.textTheme.bodyText2),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildImage(item.imageUrl),
+                    Expanded(child: Text(item.product, textAlign: TextAlign.center, style: themeData.textTheme.bodyText2)),
+                    Text('${item.quantity.toString()} ${controller.getUnitMeaName(item.unitMea)}', style: themeData.textTheme.bodyText2),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('Validade: ${DateUtils.formatDate(item.expirationDate)}', style: themeData.textTheme.caption),
+                  ],
+                ),
               ],
             ),
           ),
@@ -207,13 +217,14 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
             'assets/images/add_item.svg',
             height: 80,
             fit: BoxFit.cover,
+            placeholderBuilder: (_) => ProgressIndicatorWidget(),
           );
   }
 
   Widget _buildAddButton() {
     return FloatingActionButton(
       onPressed: () async {
-        await Modular.to.pushNamed('/storeItemAddEdit');
+        await Modular.to.pushNamed('/storeItemAddEdit', arguments: {'storeId': widget.storeId});
 
         await controller.getStoreItems(widget.storeId);
       },

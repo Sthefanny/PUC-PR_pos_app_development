@@ -17,6 +17,7 @@ import '../../shared/helpers/visual_identity_helper.dart';
 import '../../shared/utils/date_utils.dart';
 import '../../shared/utils/permission_utils.dart';
 import '../../shared/widgets/dropdown_button_default.dart';
+import '../../shared/widgets/progress_indicator_widget.dart';
 import '../../shared/widgets/text_field_default.dart';
 import '../loading/loading_controller.dart';
 import '../loading/loading_widget.dart';
@@ -36,6 +37,8 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
   final LoadingController _loadingController = Modular.get();
   final _quantityEditingController = TextEditingController();
   final _expirationDateEditingController = TextEditingController();
+  final _observationEditingController = TextEditingController();
+  final _focusQuantityField = FocusNode();
   ReactionDisposer _disposer;
   Size _size;
   final picker = ImagePicker();
@@ -45,7 +48,7 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
     super.initState();
     _validateQuantityText();
     controller
-      ..changeStoreItemId(widget.storeId)
+      ..changeStoreItemId(widget.id)
       ..init();
   }
 
@@ -112,6 +115,7 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
                       : SvgPicture.asset(
                           'assets/images/add_item.svg',
                           height: 200,
+                          placeholderBuilder: (_) => ProgressIndicatorWidget(),
                         );
             },
           ),
@@ -246,6 +250,7 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
               onChanged: controller.changeProductName,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
+              onEditingComplete: () => FocusScope.of(context).requestFocus(_focusQuantityField),
             ),
           ),
         );
@@ -315,8 +320,9 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
           onChanged: (value) {},
           keyboardType: TextInputType.number,
           textCapitalization: TextCapitalization.none,
-          textInputAction: TextInputAction.done,
+          textInputAction: TextInputAction.next,
           textEditingController: _quantityEditingController,
+          focusNode: _focusQuantityField,
         ),
       ),
     );
@@ -328,15 +334,20 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
       child: Row(
         children: [
           Expanded(
-            child: TextFieldWidget(
-              cursorColor: ColorsConfig.purpleDark,
-              hintText: 'Data de validade',
-              onChanged: controller.changeProductSelectedDateFormatted,
-              keyboardType: TextInputType.text,
-              textInputAction: TextInputAction.next,
-              textEditingController: _expirationDateEditingController,
-              readOnly: true,
-              onTap: _selectDate,
+            child: Observer(
+              builder: (_) {
+                _expirationDateEditingController.text = controller.productSelectedDateFormatted;
+                return TextFieldWidget(
+                  cursorColor: ColorsConfig.purpleDark,
+                  hintText: 'Data de validade',
+                  onChanged: controller.changeProductSelectedDateFormatted,
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.next,
+                  textEditingController: _expirationDateEditingController,
+                  readOnly: true,
+                  onTap: _selectDate,
+                );
+              },
             ),
           ),
           Container(
@@ -373,7 +384,7 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
         });
 
     if (date != null) {
-      final formattedDate = Dateutils.formatDate(date);
+      final formattedDate = DateUtils.formatDateToDescription(date);
       controller
         ..changeProductSelectedDate(date)
         ..changeProductSelectedDateFormatted(formattedDate);
@@ -393,7 +404,7 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
                 scale: 2,
                 child: Checkbox(
                   value: controller.productIsRecurrent,
-                  onChanged: (value) => controller.changeProductIsRecurrent(!value),
+                  onChanged: controller.changeProductIsRecurrent,
                   activeColor: ColorsConfig.button,
                 ),
               );
@@ -412,13 +423,21 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
   Widget _buildObservationField() {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
-      child: TextFieldWidget(
-        cursorColor: ColorsConfig.purpleDark,
-        hintText: 'Observação',
-        onChanged: controller.changeProductObservation,
-        keyboardType: TextInputType.multiline,
-        textInputAction: TextInputAction.newline,
-        maxLines: 6,
+      child: Observer(
+        builder: (_) {
+          _observationEditingController
+            ..text = controller.productObservation
+            ..selection = TextSelection.fromPosition(TextPosition(offset: _observationEditingController.text.length));
+          return TextFieldWidget(
+            cursorColor: ColorsConfig.purpleDark,
+            hintText: 'Observação',
+            onChanged: controller.changeProductObservation,
+            keyboardType: TextInputType.multiline,
+            textInputAction: TextInputAction.newline,
+            maxLines: 6,
+            textEditingController: _observationEditingController,
+          );
+        },
       ),
     );
   }
@@ -456,12 +475,12 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
             textColor: Colors.white,
             disabledTextColor: Colors.grey,
             onPressed: controller.canAddEditStore
-                ? widget.storeId != null
+                ? widget.id != null
                     ? _editItemFromStore
                     : _addItemToStore
                 : null,
             child: Text(
-              widget.storeId != null ? 'Atualizar'.toUpperCase() : 'Criar'.toUpperCase(),
+              widget.id != null ? 'Atualizar'.toUpperCase() : 'Criar'.toUpperCase(),
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           );
@@ -506,6 +525,8 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
       if (result) {
         Modular.to.pop();
         SnackbarMessages.showSuccess(context: context, description: 'Produto atualizado com sucesso!');
+      } else {
+        SnackbarMessages.showError(context: context, description: 'Ocorreu um problema. Por favor, tente novamente em alguns minutos');
       }
     }).catchError((error) async {
       final errorHandled = await DioConfig.handleError(error);

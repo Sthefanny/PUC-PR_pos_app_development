@@ -11,6 +11,7 @@ import '../../shared/helpers/snackbar_messages_helper.dart';
 import '../../shared/helpers/visual_identity_helper.dart';
 import '../../shared/models/responses/store_response.dart';
 import '../../shared/widgets/empty_list.dart';
+import '../../shared/widgets/progress_indicator_widget.dart';
 import '../../shared/widgets/user_header_widget.dart';
 import '../loading/loading_controller.dart';
 import '../loading/loading_widget.dart';
@@ -65,12 +66,7 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
             decoration: VisualIdentityHelper.buildBackground(),
             child: Column(
               children: [
-                FutureBuilder(
-                    future: controller.setUserName(),
-                    builder: (_, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-                      return UserHeaderWidget(userName: snapshot.data ?? '');
-                    }),
+                UserHeaderWidget(parentContext: context),
                 Expanded(child: buildStoreList()),
               ],
             ),
@@ -88,7 +84,7 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
       child: FutureBuilder<List<StoreResponse>>(
         future: _storesResponse,
         builder: (_, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+          if (snapshot.connectionState == ConnectionState.waiting) return ProgressIndicatorWidget();
 
           if (snapshot.hasError) {
             Future.delayed(Duration.zero, () => SnackbarMessages.showError(context: context, description: snapshot.error));
@@ -235,6 +231,7 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
       'assets/images/store.svg',
       width: 100,
       fit: BoxFit.cover,
+      placeholderBuilder: (_) => ProgressIndicatorWidget(),
     );
   }
 

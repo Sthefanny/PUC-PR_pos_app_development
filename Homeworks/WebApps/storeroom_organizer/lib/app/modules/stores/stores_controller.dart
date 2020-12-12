@@ -4,7 +4,6 @@ import 'package:mobx/mobx.dart';
 import '../../shared/models/requests/store_request.dart';
 import '../../shared/models/responses/store_response.dart';
 import '../../shared/services/stores_service.dart';
-import '../../shared/utils/user_utils.dart';
 
 part 'stores_controller.g.dart';
 
@@ -27,11 +26,6 @@ abstract class _StoresControllerBase with Store {
 
   @computed
   bool get canAddNewStore => newStoreName != null && newStoreName.isNotEmpty;
-
-  Future<String> setUserName() async {
-    final _userData = await UserUtils.getUserData();
-    return _userData.name;
-  }
 
   Future<List<StoreResponse>> getStores() async {
     final response = <StoreResponse>[];

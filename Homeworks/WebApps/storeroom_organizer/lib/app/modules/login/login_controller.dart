@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
 
-import '../../shared/configs/dio_config.dart';
 import '../../shared/extensions/string_extensions.dart';
 import '../../shared/models/requests/create_user_request.dart';
 import '../../shared/models/requests/login_request.dart';

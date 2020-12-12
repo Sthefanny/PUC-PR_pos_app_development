@@ -14,6 +14,7 @@ import '../../shared/models/responses/store_item_response.dart';
 import '../../shared/models/unit_mea_model.dart';
 import '../../shared/services/product_service.dart';
 import '../../shared/services/store_items_service.dart';
+import '../../shared/utils/date_utils.dart';
 
 part 'store_item_add_edit_controller.g.dart';
 
@@ -77,7 +78,7 @@ abstract class _StoreItemAddEditControllerBase with Store {
   @action
   String changeProductObservation(String value) => productObservation = value;
   @action
-  bool changeProductIsRecurrent(bool value) => productIsRecurrent = !value;
+  bool changeProductIsRecurrent(bool value) => productIsRecurrent = value;
   @action
   DateTime changeProductSelectedDate(DateTime value) => productSelectedDate = value;
   @action
@@ -192,10 +193,15 @@ abstract class _StoreItemAddEditControllerBase with Store {
       await _storeService.getItemFromStore(storeItemId).then(
         (result) {
           if (result != null && result.id != null) {
+            if (result.imageUrl.isNotNullOrEmpty()) changeImageUrl('${UrlConfig.baseUrl}${result.imageUrl}');
             changeProductSelected(result.productId);
             changeUnitMeaSelected(result.unitMea);
             changeQuantity(result.quantity.toInt());
-            if (result.imageUrl.isNotNullOrEmpty()) changeImageUrl('${UrlConfig.baseUrl}${result.imageUrl}');
+            final date = DateUtils.toDate(result.expirationDate);
+            changeProductSelectedDateFormatted(DateUtils.formatDateToDescription(date));
+            changeProductSelectedDate(date);
+            changeProductObservation(result.observation);
+            changeProductIsRecurrent(result.recurrent);
             return;
           }
         },
@@ -226,12 +232,12 @@ abstract class _StoreItemAddEditControllerBase with Store {
           if (result != null && result.id != null) {
             if (imagePicked != null) {
               final imageResponse = await addImageToStoreItem(result.id);
-              response = imageResponse;
+              return response = imageResponse;
             }
-            response = true;
+            return response = true;
           }
 
-          response = false;
+          return response = false;
         });
       }
       return response;

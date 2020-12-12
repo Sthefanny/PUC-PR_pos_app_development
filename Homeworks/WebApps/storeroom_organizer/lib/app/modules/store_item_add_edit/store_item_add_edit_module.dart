@@ -15,7 +15,7 @@ class StoreItemAddEditModule extends ChildModule {
 
   @override
   List<ModularRouter> get routers => [
-        ModularRouter(Modular.initialRoute, child: (_, args) => StoreItemAddEditPage(storeId: args?.data != null ? args?.data['storeId'] : null)),
+        ModularRouter(Modular.initialRoute, child: (_, args) => StoreItemAddEditPage(storeId: args?.data != null ? args?.data['storeId'] : null, id: args?.data != null ? args?.data['id'] : null)),
       ];
 
   static Inject get to => Inject<StoreItemAddEditModule>.of();

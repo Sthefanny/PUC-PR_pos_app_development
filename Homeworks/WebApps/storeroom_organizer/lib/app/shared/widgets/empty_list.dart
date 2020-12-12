@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../configs/themes_config.dart';
+import 'progress_indicator_widget.dart';
 
 class EmptyList extends StatelessWidget {
   final String svgImage;
@@ -26,6 +27,7 @@ class EmptyList extends StatelessWidget {
       child: SvgPicture.asset(
         'assets/images/$svgImage.svg',
         height: 300,
+        placeholderBuilder: (_) => ProgressIndicatorWidget(),
       ),
     );
   }

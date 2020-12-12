@@ -38,6 +38,10 @@ class UserUtils {
     return _tokenService.deleteItem(ConfigurationEnum.token.toStr);
   }
 
+  static Future<void> deleteAll() async {
+    return _tokenService.deleteAll();
+  }
+
   static Future<void> loadFirebaseKey() async {
     try {
       final _userData = await getUserData();

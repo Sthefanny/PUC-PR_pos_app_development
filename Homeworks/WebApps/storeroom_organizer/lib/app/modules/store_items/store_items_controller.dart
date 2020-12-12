@@ -1,11 +1,9 @@
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
 
-import '../../shared/configs/dio_config.dart';
 import '../../shared/models/enums/unit_mea_enum.dart';
 import '../../shared/models/responses/store_item_response.dart';
 import '../../shared/services/store_items_service.dart';
-import '../../shared/utils/user_utils.dart';
 
 part 'store_items_controller.g.dart';
 
@@ -21,12 +19,6 @@ abstract class _StoreItemsControllerBase with Store {
   String userName = '';
   @observable
   ObservableList<StoreItemResponse> storeList;
-
-  @action
-  Future<void> setUserName() async {
-    final _userData = await UserUtils.getUserData();
-    userName = _userData.name;
-  }
 
   Future<void> getStoreItems(int storeId) async {
     try {
