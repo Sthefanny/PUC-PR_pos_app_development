@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
 import 'app/app_module.dart';
+import 'app/shared/configs/colors_config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,7 @@ Future<void> main() async {
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
   runZonedGuarded(() {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: ColorsConfig.statusBar, statusBarIconBrightness: Brightness.light, statusBarBrightness: Brightness.light));
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
       runApp(ModularApp(module: AppModule()));
     });

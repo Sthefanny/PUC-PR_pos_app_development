@@ -62,13 +62,15 @@ class _StoresPageState extends ModularState<StoresPage, StoresController> {
       body: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         child: LoadingWidget(
-          child: Container(
-            decoration: VisualIdentityHelper.buildBackground(),
-            child: Column(
-              children: [
-                UserHeaderWidget(parentContext: context),
-                Expanded(child: buildStoreList()),
-              ],
+          child: SafeArea(
+            child: Container(
+              decoration: VisualIdentityHelper.buildBackground(),
+              child: Column(
+                children: [
+                  UserHeaderWidget(parentContext: context),
+                  Expanded(child: buildStoreList()),
+                ],
+              ),
             ),
           ),
         ),

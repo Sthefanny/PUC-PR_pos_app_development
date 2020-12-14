@@ -22,7 +22,7 @@ class UserHeaderWidget extends StatelessWidget {
     return InkWell(
       onTap: () => showMenuDialog(context),
       child: Container(
-        margin: const EdgeInsets.only(top: 40, bottom: 10),
+        margin: const EdgeInsets.only(top: 10, bottom: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [

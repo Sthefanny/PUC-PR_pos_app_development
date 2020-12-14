@@ -85,14 +85,16 @@ class _StoreItemAddEditPageState extends ModularState<StoreItemAddEditPage, Stor
       body: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         child: LoadingWidget(
-          child: Container(
-            decoration: VisualIdentityHelper.buildBackground(),
-            child: ListView(
-              children: [
-                _buildHeader(),
-                _buildBody(),
-                _buildButton(),
-              ],
+          child: SafeArea(
+            child: Container(
+              decoration: VisualIdentityHelper.buildBackground(),
+              child: ListView(
+                children: [
+                  _buildHeader(),
+                  _buildBody(),
+                  _buildButton(),
+                ],
+              ),
             ),
           ),
         ),

@@ -46,7 +46,7 @@ class _MyAccountPageState extends ModularState<MyAccountPage, MyAccountControlle
       body: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         child: LoadingWidget(
-          child: _buildContent(),
+          child: SafeArea(child: _buildContent()),
         ),
       ),
     );
@@ -79,12 +79,9 @@ class _MyAccountPageState extends ModularState<MyAccountPage, MyAccountControlle
                 );
               }),
         ),
-        Positioned(
-          top: 20,
-          child: IconButton(
-            icon: const FaIcon(FontAwesomeIcons.arrowLeft, color: Colors.white),
-            onPressed: () => Modular.to.pop(),
-          ),
+        IconButton(
+          icon: const FaIcon(FontAwesomeIcons.arrowLeft, color: Colors.white),
+          onPressed: () => Modular.to.pop(),
         ),
       ],
     );

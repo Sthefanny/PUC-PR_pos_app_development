@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 class ColorsConfig {
+  static const Color statusBar = Color(0xFF40224C);
   static const Color purpleDark = Color(0xFF4e295c);
   static const Color purpleLight = Color(0xFFab6df1);
   static const Color titleColor = Color(0xFFFFFFFF);

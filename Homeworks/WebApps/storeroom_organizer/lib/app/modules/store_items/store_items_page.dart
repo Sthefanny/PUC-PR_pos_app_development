@@ -4,8 +4,8 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:storeroom_organizer/app/shared/configs/colors_config.dart';
 
+import '../../shared/configs/colors_config.dart';
 import '../../shared/configs/dio_config.dart';
 import '../../shared/configs/themes_config.dart';
 import '../../shared/configs/urls_config.dart';
@@ -61,13 +61,15 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
       body: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         child: LoadingWidget(
-          child: Container(
-            decoration: VisualIdentityHelper.buildBackground(),
-            child: Column(
-              children: [
-                _buildTop(),
-                Expanded(child: buildStoreItemsList()),
-              ],
+          child: SafeArea(
+            child: Container(
+              decoration: VisualIdentityHelper.buildBackground(),
+              child: Column(
+                children: [
+                  _buildTop(),
+                  Expanded(child: buildStoreItemsList()),
+                ],
+              ),
             ),
           ),
         ),
@@ -87,24 +89,21 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
   }
 
   Widget _buildTitle() {
-    return Container(
-      margin: const EdgeInsets.only(top: 30),
-      child: Row(
-        children: [
-          Container(
-            margin: const EdgeInsets.only(right: 10),
-            child: IconButton(
-              icon: const FaIcon(FontAwesomeIcons.arrowLeft),
-              onPressed: () => Modular.to.pop(),
-              color: Colors.white,
-            ),
+    return Row(
+      children: [
+        Container(
+          margin: const EdgeInsets.only(right: 10),
+          child: IconButton(
+            icon: const FaIcon(FontAwesomeIcons.arrowLeft),
+            onPressed: () => Modular.to.pop(),
+            color: Colors.white,
           ),
-          Text(
-            widget.storeName,
-            style: themeData.textTheme.headline5.merge(const TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
+        ),
+        Text(
+          widget.storeName,
+          style: themeData.textTheme.headline5.merge(const TextStyle(color: Colors.white)),
+        ),
+      ],
     );
   }
 
