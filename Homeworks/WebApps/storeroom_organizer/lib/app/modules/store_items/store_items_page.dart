@@ -4,6 +4,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:storeroom_organizer/app/shared/configs/colors_config.dart';
 
 import '../../shared/configs/dio_config.dart';
 import '../../shared/configs/themes_config.dart';
@@ -193,7 +194,7 @@ class _StoreItemsPageState extends ModularState<StoreItemsPage, StoreItemsContro
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text('Validade: ${DateUtils.formatDate(item.expirationDate)}', style: themeData.textTheme.caption),
+                    Text('Validade: ${DateUtils.formatDate(item.expirationDate)}', style: themeData.textTheme.caption.merge(TextStyle(color: item.expiredAlert ? Colors.red : ColorsConfig.textColor))),
                   ],
                 ),
               ],

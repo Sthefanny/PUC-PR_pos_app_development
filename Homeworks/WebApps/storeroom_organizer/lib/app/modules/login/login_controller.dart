@@ -35,6 +35,10 @@ abstract class _LoginControllerBase with Store {
   @computed
   String get signupConfirmPass => _loginStore.signupConfirmPass;
   @computed
+  String get daysToExpire => _loginStore.daysToExpire;
+  @computed
+  String get minimumShoppingList => _loginStore.minimumShoppingList;
+  @computed
   PageController get pageController => _loginStore.pageController;
 
   @action
@@ -49,6 +53,10 @@ abstract class _LoginControllerBase with Store {
   String changeSignupPass(String value) => _loginStore.changeSignupPass(value);
   @action
   String changeSignupConfirmPass(String value) => _loginStore.changeSignupConfirmPass(value);
+  @action
+  String changeDaysToExpire(String value) => _loginStore.changeDaysToExpire(value);
+  @action
+  String changeMinimumShoppingList(String value) => _loginStore.changeMinimumShoppingList(value);
 
   @action
   Future<void> changePageController(int value) {
@@ -78,7 +86,13 @@ abstract class _LoginControllerBase with Store {
   bool get isPassEqual => signupPass.isNotNullOrEmpty() && signupConfirmPass.isNotNullOrEmpty() && signupPass == signupConfirmPass;
 
   @computed
-  bool get canSignUp => signupName.isNotNullOrEmpty() && signupLogin.isNotNullOrEmpty() && signupPass.isNotNullOrEmpty() && signupConfirmPass.isNotNullOrEmpty();
+  bool get canSignUp =>
+      signupName.isNotNullOrEmpty() &&
+      signupLogin.isNotNullOrEmpty() &&
+      signupPass.isNotNullOrEmpty() &&
+      signupConfirmPass.isNotNullOrEmpty() &&
+      daysToExpire.isNotNullOrEmpty() &&
+      minimumShoppingList.isNotNullOrEmpty();
 
   @action
   Future<bool> submitSignIn() async {

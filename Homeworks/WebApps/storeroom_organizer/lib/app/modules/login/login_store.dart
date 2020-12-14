@@ -18,6 +18,10 @@ abstract class _LoginStoreBase with Store {
   @observable
   String signupConfirmPass;
   @observable
+  String daysToExpire;
+  @observable
+  String minimumShoppingList;
+  @observable
   PageController pageController = PageController();
 
   @action
@@ -32,4 +36,8 @@ abstract class _LoginStoreBase with Store {
   String changeSignupPass(String value) => signupPass = value;
   @action
   String changeSignupConfirmPass(String value) => signupConfirmPass = value;
+  @action
+  String changeDaysToExpire(String value) => daysToExpire = value;
+  @action
+  String changeMinimumShoppingList(String value) => minimumShoppingList = value;
 }

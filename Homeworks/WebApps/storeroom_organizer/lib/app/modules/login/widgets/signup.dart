@@ -21,10 +21,14 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
   final _focusLogin = FocusNode();
   final _focusPassword = FocusNode();
   final _focusConfirmPass = FocusNode();
+  final _focusDaysToExpire = FocusNode();
+  final _focusMinimumShoppingList = FocusNode();
   final _nameController = TextEditingController();
   final _loginController = TextEditingController();
   final _passController = TextEditingController();
   final _confirmPassController = TextEditingController();
+  final _daysToExpireController = TextEditingController();
+  final _minimumShoppingListController = TextEditingController();
   Size _size;
 
   @override
@@ -46,7 +50,7 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  padding: const EdgeInsets.only(top: 5, bottom: 20),
                   margin: const EdgeInsets.symmetric(horizontal: 10),
                   width: 300,
                   height: 320,
@@ -57,6 +61,8 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
                       loginField(),
                       passwordField(),
                       confirmPassField(),
+                      daysToExpireField(),
+                      minimumShoppingListField(),
                     ],
                   ),
                 ),
@@ -139,9 +145,43 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
             focusNode: _focusConfirmPass,
             textEditingController: _confirmPassController,
             textInputAction: TextInputAction.done,
-            onEditingComplete: controller.canSignUp ? _signUp : null,
+            onEditingComplete: () => FocusScope.of(context).requestFocus(_focusDaysToExpire),
           );
         },
+      ),
+    );
+  }
+
+  Widget daysToExpireField() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: TextFieldWidget(
+        cursorColor: ColorsConfig.purpleDark,
+        hintText: 'Alerta de expiração',
+        onChanged: controller.changeDaysToExpire,
+        keyboardType: TextInputType.number,
+        focusNode: _focusDaysToExpire,
+        textEditingController: _daysToExpireController,
+        textCapitalization: TextCapitalization.none,
+        textInputAction: TextInputAction.next,
+        onEditingComplete: () => FocusScope.of(context).requestFocus(_focusMinimumShoppingList),
+      ),
+    );
+  }
+
+  Widget minimumShoppingListField() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: TextFieldWidget(
+        cursorColor: ColorsConfig.purpleDark,
+        hintText: 'Mínimo para lista de compras',
+        onChanged: controller.changeMinimumShoppingList,
+        keyboardType: TextInputType.number,
+        focusNode: _focusMinimumShoppingList,
+        textEditingController: _minimumShoppingListController,
+        textCapitalization: TextCapitalization.none,
+        textInputAction: TextInputAction.next,
+        onEditingComplete: controller.canSignUp ? _signUp : null,
       ),
     );
   }
@@ -208,6 +248,8 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
     _loginController.clear();
     _passController.clear();
     _confirmPassController.clear();
+    _daysToExpireController.clear();
+    _minimumShoppingListController.clear();
     controller
       ..changeSignupName('')
       ..changeSignupLogin('')
