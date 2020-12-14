@@ -56,17 +56,34 @@ class UserHeaderWidget extends StatelessWidget {
             future: getUserName(),
             builder: (context, snapshot) {
               return AlertDialog(
-                title: Text('Olá ${snapshot.data ?? ''}, o que deseja fazer?', style: themeData.textTheme.subtitle1),
+                title: Text('Olá ${snapshot.data ?? ''}, o que deseja fazer?', style: themeData.textTheme.headline6),
                 content: SingleChildScrollView(
                   child: ListBody(
                     children: <Widget>[
-                      RaisedButton(
-                        onPressed: () {
-                          Modular.to.pop();
-                          showLogoutDialog(context);
-                        },
-                        color: ColorsConfig.button,
-                        child: Text('Sair', style: themeData.textTheme.button.merge(const TextStyle(color: Colors.white))),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        child: ButtonTheme(
+                          height: 50,
+                          child: RaisedButton(
+                            onPressed: () {
+                              Modular.to.pop();
+                              Modular.to.pushNamed('/myAccount');
+                            },
+                            color: ColorsConfig.button,
+                            child: Text('Minha Conta', style: themeData.textTheme.button.merge(const TextStyle(color: Colors.white))),
+                          ),
+                        ),
+                      ),
+                      ButtonTheme(
+                        height: 50,
+                        child: RaisedButton(
+                          onPressed: () {
+                            Modular.to.pop();
+                            showLogoutDialog(context);
+                          },
+                          color: ColorsConfig.button,
+                          child: Text('Sair', style: themeData.textTheme.button.merge(const TextStyle(color: Colors.white))),
+                        ),
                       ),
                     ],
                   ),
@@ -76,7 +93,7 @@ class UserHeaderWidget extends StatelessWidget {
                       onPressed: Modular.to.pop,
                       child: Text(
                         'Cancelar',
-                        style: themeData.textTheme.button.merge(const TextStyle(color: ColorsConfig.purpleDark)),
+                        style: themeData.textTheme.button.merge(const TextStyle(color: ColorsConfig.button)),
                       )),
                 ],
               );
@@ -91,15 +108,15 @@ class UserHeaderWidget extends StatelessWidget {
       barrierDismissible: true,
       builder: (_) {
         return AlertDialog(
-          title: Text('Tem certeza que quer sair?', style: themeData.textTheme.subtitle1),
+          title: Text('Tem certeza que quer sair?', style: themeData.textTheme.headline6),
           actions: [
             TextButton(
               onPressed: Modular.to.pop,
-              child: Text('Cancelar', style: themeData.textTheme.button.merge(const TextStyle(color: ColorsConfig.purpleDark))),
+              child: Text('Cancelar', style: themeData.textTheme.button.merge(const TextStyle(color: ColorsConfig.button))),
             ),
             TextButton(
               onPressed: _logout,
-              child: Text('Sair', style: themeData.textTheme.button.merge(const TextStyle(color: ColorsConfig.purpleDark))),
+              child: Text('Sair', style: themeData.textTheme.button.merge(const TextStyle(color: ColorsConfig.button))),
             ),
           ],
         );

@@ -4,7 +4,6 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:storeroom_organizer/app/shared/configs/colors_config.dart';
 
 import '../../shared/configs/dio_config.dart';
 import '../../shared/configs/themes_config.dart';

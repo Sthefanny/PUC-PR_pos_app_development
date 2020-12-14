@@ -33,10 +33,10 @@ abstract class RestClient {
   @POST('/User/logout')
   Future<HttpResponse> logout();
 
-  @POST('/User/update-password')
-  Future<LoginResponse> updatePassword(@Body() UpdatePasswordRequest request);
+  @PUT('/User/update-password')
+  Future<HttpResponse> updatePassword(@Body() UpdatePasswordRequest request);
 
-  @POST('/User/logout')
+  @PUT('/User')
   Future<LoginResponse> updateUser(@Body() UpdateUserRequest request);
 
   @GET('/Product/list')

@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'app_widget.dart';
 import 'modules/loading/loading_controller.dart';
 import 'modules/login/login_module.dart';
+import 'modules/my_account/my_account_module.dart';
 import 'modules/splash/splash_module.dart';
 import 'modules/store_add_edit/store_add_edit_module.dart';
 import 'modules/store_item_add_edit/store_item_add_edit_module.dart';
@@ -38,6 +39,7 @@ class AppModule extends MainModule {
         ModularRouter('/storeItems', module: StoreItemsModule()),
         ModularRouter('/storeAddEdit', module: StoreAddEditModule()),
         ModularRouter('/storeItemAddEdit', module: StoreItemAddEditModule()),
+        ModularRouter('/myAccount', module: MyAccountModule()),
       ];
 
   @override

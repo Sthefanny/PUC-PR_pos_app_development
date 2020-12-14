@@ -7,7 +7,6 @@ import '../../shared/configs/colors_config.dart';
 import '../../shared/configs/themes_config.dart';
 import '../../shared/helpers/snackbar_messages_helper.dart';
 import '../../shared/helpers/visual_identity_helper.dart';
-import '../../shared/models/responses/store_response.dart';
 import '../../shared/widgets/text_field_default.dart';
 import '../loading/loading_controller.dart';
 import '../loading/loading_widget.dart';
@@ -26,7 +25,6 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
   final LoadingController _loadingController = Modular.get();
   TextEditingController nameEditingController = TextEditingController();
   TextEditingController descriptionEditingController = TextEditingController();
-  Future<StoreResponse> _storeResponse;
   Size _size;
 
   @override
@@ -37,7 +35,7 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
 
   void getStoreData() {
     if (widget.storeId != null) {
-      _storeResponse = controller.getStoreData(widget.storeId);
+      controller.getStoreData(widget.storeId);
     }
   }
 
@@ -87,64 +85,55 @@ class _StoreAddEditPageState extends ModularState<StoreAddEditPage, StoreAddEdit
   }
 
   Widget _buildBody() {
-    return FutureBuilder<StoreResponse>(
-        future: _storeResponse,
-        builder: (_, snapshot) {
-          if (snapshot.hasError) {
-            Future.delayed(Duration.zero, () => SnackbarMessages.showError(context: context, description: snapshot.error));
-          }
-
-          if (snapshot.hasData) {
-            final item = snapshot.data;
-            Future.delayed(Duration.zero, () {
-              controller
-                ..changeNewStoreName(item.name)
-                ..changeNewStoreDescription(item.description);
-              nameEditingController.text = item.name;
-              descriptionEditingController.text = item.description;
-              nameEditingController.selection = TextSelection.fromPosition(TextPosition(offset: nameEditingController.text.length));
-              descriptionEditingController.selection = TextSelection.fromPosition(TextPosition(offset: descriptionEditingController.text.length));
-            });
-          }
-
-          return Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            child: Column(
-              children: [
-                _buildNameField(),
-                _buildDescriptionField(),
-              ],
-            ),
-          );
-        });
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      child: Column(
+        children: [
+          _buildNameField(),
+          _buildDescriptionField(),
+        ],
+      ),
+    );
   }
 
   Widget _buildNameField() {
     return Container(
       margin: const EdgeInsets.all(10),
-      child: TextFieldWidget(
-        cursorColor: ColorsConfig.purpleDark,
-        hintText: 'Nome',
-        onChanged: controller.changeNewStoreName,
-        keyboardType: TextInputType.text,
-        textInputAction: TextInputAction.next,
-        textEditingController: nameEditingController,
-      ),
+      child: Observer(builder: (_) {
+        nameEditingController
+          ..text = controller.newStoreName
+          ..selection = TextSelection.fromPosition(TextPosition(offset: nameEditingController.text.length));
+
+        return TextFieldWidget(
+          cursorColor: ColorsConfig.purpleDark,
+          hintText: 'Nome',
+          onChanged: controller.changeNewStoreName,
+          keyboardType: TextInputType.text,
+          textInputAction: TextInputAction.next,
+          textEditingController: nameEditingController,
+        );
+      }),
     );
   }
 
   Widget _buildDescriptionField() {
     return Container(
       margin: const EdgeInsets.all(10),
-      child: TextFieldWidget(
-        cursorColor: ColorsConfig.purpleDark,
-        hintText: 'Descrição',
-        onChanged: controller.changeNewStoreDescription,
-        keyboardType: TextInputType.multiline,
-        textInputAction: TextInputAction.newline,
-        maxLines: 6,
-        textEditingController: descriptionEditingController,
-      ),
+      child: Observer(builder: (_) {
+        descriptionEditingController
+          ..text = controller.newStoreDescription
+          ..selection = TextSelection.fromPosition(TextPosition(offset: descriptionEditingController.text.length));
+
+        return TextFieldWidget(
+          cursorColor: ColorsConfig.purpleDark,
+          hintText: 'Descrição',
+          onChanged: controller.changeNewStoreDescription,
+          keyboardType: TextInputType.multiline,
+          textInputAction: TextInputAction.newline,
+          maxLines: 6,
+          textEditingController: descriptionEditingController,
+        );
+      }),
     );
   }
 

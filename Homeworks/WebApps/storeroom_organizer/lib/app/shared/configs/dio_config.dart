@@ -78,7 +78,7 @@ class DioConfig {
         final response = await _repository.refreshToken({'refreshToken': refreshToken});
 
         if (response?.accessToken != null) {
-          await UserUtils.saveUserData(response);
+          await UserUtils.saveTokens(response);
           await _authConfig.addAuth();
           return true;
         }

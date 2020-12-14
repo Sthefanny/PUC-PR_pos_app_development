@@ -2,7 +2,6 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../shared/models/requests/store_request.dart';
-import '../../shared/models/responses/store_response.dart';
 import '../../shared/services/stores_service.dart';
 
 part 'store_add_edit_controller.g.dart';
@@ -57,14 +56,17 @@ abstract class _StoreAddEditControllerBase with Store {
     return response;
   }
 
-  Future<StoreResponse> getStoreData(int storeId) async {
-    StoreResponse response;
-
+  Future<void> getStoreData(int storeId) async {
     try {
-      await _service.getStore(storeId).then((result) => response = result);
+      await _service.getStore(storeId).then((result) {
+        if (result != null && result.id != null) {
+          changeNewStoreName(result.name);
+          changeNewStoreDescription(result.description);
+          return;
+        }
+      });
     } catch (e) {
       rethrow;
     }
-    return response;
   }
 }

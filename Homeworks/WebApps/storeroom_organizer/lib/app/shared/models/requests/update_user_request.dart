@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'update_user_request.g.dart';
@@ -10,10 +11,10 @@ class UpdateUserRequest {
   final int daysToExpire;
 
   UpdateUserRequest({
-    this.id,
-    this.name,
-    this.minimumProductListPurchase,
-    this.daysToExpire,
+    @required this.id,
+    @required this.name,
+    @required this.minimumProductListPurchase,
+    @required this.daysToExpire,
   });
 
   factory UpdateUserRequest.fromJson(Map<String, dynamic> json) => _$UpdateUserRequestFromJson(json);

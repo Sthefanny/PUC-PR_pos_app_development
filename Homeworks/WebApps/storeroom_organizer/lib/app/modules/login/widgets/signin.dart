@@ -4,6 +4,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../shared/configs/colors_config.dart';
+import '../../../shared/configs/dio_config.dart';
 import '../../../shared/helpers/snackbar_messages_helper.dart';
 import '../../../shared/widgets/text_field_default.dart';
 import '../../loading/loading_controller.dart';
@@ -132,10 +133,17 @@ class _SignInState extends ModularState<SignIn, LoginController> {
       _loadingController.changeVisibility(false);
       if (result) {
         Modular.to.pushReplacementNamed('/stores');
+      } else {
+        SnackbarMessages.showError(context: context, description: 'Ocorreu um erro, por favor tente novamente em alguns minutos.');
       }
-    }).catchError((error) {
+    }).catchError((error) async {
+      final errorHandled = await DioConfig.handleError(error);
+      if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
+        _loadingController.changeVisibility(false);
+        return _signIn();
+      }
       _loadingController.changeVisibility(false);
-      SnackbarMessages.showError(context: widget.parentContext, description: error?.message);
+      SnackbarMessages.showError(context: context, description: errorHandled?.failure.toString());
     }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 }

@@ -11,17 +11,21 @@ class UserUtils {
   static final SecureStorageRepository _tokenService = Modular.get();
 
   static Future<void> saveUserData(LoginResponse response) async {
+    final _userData = jsonEncode(response.toJson());
+    await _tokenService.setItem(ConfigurationEnum.userData.toStr, _userData);
+  }
+
+  static Future<void> saveTokens(LoginResponse response) async {
     if (response.accessToken != null) {
       await _tokenService.setItem(ConfigurationEnum.token.toStr, response.accessToken);
       await _tokenService.setItem(ConfigurationEnum.refreshToken.toStr, response.refreshToken);
-      final _userData = jsonEncode(response.toJson());
-      await _tokenService.setItem(ConfigurationEnum.userData.toStr, _userData);
     }
   }
 
   static Future<LoginResponse> getUserData() async {
     final json = await _tokenService.getItem(ConfigurationEnum.userData.toStr);
-    return LoginResponse.fromJson(jsonDecode(json));
+    final response = LoginResponse.fromJson(jsonDecode(json));
+    return response;
   }
 
   static Future<String> getToken() async {

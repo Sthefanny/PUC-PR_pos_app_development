@@ -19,6 +19,7 @@ class AuthService extends Disposable {
     final response = await _repository.login(request);
 
     if (response.accessToken != null) {
+      await UserUtils.saveTokens(response);
       await UserUtils.saveUserData(response);
       await UserUtils.loadFirebaseKey();
       _authConfig.addAuth();
