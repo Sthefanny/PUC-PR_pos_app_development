@@ -11,7 +11,7 @@ class SplashModule extends ChildModule {
 
   @override
   List<ModularRouter> get routers => [
-        ModularRouter(Modular.initialRoute, child: (_, args) => SplashPage(), transition: TransitionType.downToUp),
+        ModularRouter(Modular.initialRoute, child: (_, args) => const SplashPage(), transition: TransitionType.downToUp),
       ];
 
   static Inject get to => Inject<SplashModule>.of();

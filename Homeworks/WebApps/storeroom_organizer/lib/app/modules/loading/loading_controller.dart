@@ -9,5 +9,5 @@ abstract class _LoadingControllerBase with Store {
   bool isLoading = false;
 
   @action
-  void changeVisibility(bool value) => isLoading = value;
+  bool changeVisibility(bool value) => isLoading = value;
 }

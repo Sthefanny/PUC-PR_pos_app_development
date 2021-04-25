@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
+import '../../shared/widgets/progress_indicator_widget.dart';
 import 'loading_controller.dart';
 
 class LoadingWidget extends StatefulWidget {
@@ -19,7 +20,6 @@ class _LoadingWidgetState extends ModularState<LoadingWidget, LoadingController>
   Widget build(BuildContext context) {
     return Observer(builder: (_) {
       return LoadingOverlay(
-        child: widget.child,
         isLoading: controller.isLoading,
         color: Colors.black,
         progressIndicator: Center(
@@ -30,9 +30,9 @@ class _LoadingWidgetState extends ModularState<LoadingWidget, LoadingController>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.purple)),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
+                  ProgressIndicatorWidget(),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 10),
                     child: Text('Carregando...'),
                   ),
                 ],
@@ -40,6 +40,7 @@ class _LoadingWidgetState extends ModularState<LoadingWidget, LoadingController>
             ),
           ),
         ),
+        child: widget.child,
       );
     });
   }

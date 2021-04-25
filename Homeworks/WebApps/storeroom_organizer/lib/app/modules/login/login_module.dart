@@ -7,13 +7,13 @@ import 'login_store.dart';
 class LoginModule extends ChildModule {
   @override
   List<Bind> get binds => [
-        Bind((i) => LoginStore(), singleton: true),
+        Bind((i) => LoginStore()),
         Bind((i) => LoginController(i(), i())),
       ];
 
   @override
   List<ModularRouter> get routers => [
-        ModularRouter(Modular.initialRoute, child: (_, args) => LoginPage()),
+        ModularRouter(Modular.initialRoute, child: (_, args) => LoginPage(error: args?.data != null ? args?.data['error'] : null)),
       ];
 
   static Inject get to => Inject<LoginModule>.of();

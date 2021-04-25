@@ -9,23 +9,23 @@ class ProductService extends Disposable {
   ProductService(this._repository);
 
   Future<List<ProductResponse>> listAllProducts() async {
-    var response = await _repository.listProducts();
+    final response = await _repository.listProducts();
 
     if (response != null) {
       return response;
     }
 
-    throw 'Ocorreu um erro ao tentar listar os produtos.';
+    throw Exception('Ocorreu um erro ao tentar listar os produtos.');
   }
 
   Future<ProductResponse> getProduct(int id) async {
-    var response = await _repository.getProduct(id);
+    final response = await _repository.getProduct(id);
 
     if (response != null) {
       return response;
     }
 
-    throw 'Ocorreu um erro ao tentar retornar o produto.';
+    throw Exception('Ocorreu um erro ao tentar retornar o produto.');
   }
 
   @override

@@ -1,4 +1,4 @@
-package com.example.storeroom_organizer
+package com.sthefanny.storeroom_organizer
 
 import io.flutter.embedding.android.FlutterActivity
 

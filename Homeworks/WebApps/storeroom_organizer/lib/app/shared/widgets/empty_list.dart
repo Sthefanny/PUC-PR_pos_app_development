@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../configs/themes_config.dart';
+import 'progress_indicator_widget.dart';
 
 class EmptyList extends StatelessWidget {
+  final String svgImage;
+  final String title;
+
+  const EmptyList({Key key, @required this.svgImage, this.title}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -19,8 +25,9 @@ class EmptyList extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 20),
       child: SvgPicture.asset(
-        'assets/images/empty_list.svg',
+        'assets/images/$svgImage.svg',
         height: 300,
+        placeholderBuilder: (_) => ProgressIndicatorWidget(),
       ),
     );
   }
@@ -29,8 +36,8 @@ class EmptyList extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
       child: Text(
-        'A lista está vazia.',
-        style: themeData.textTheme.headline5.merge(TextStyle(color: Colors.white)),
+        title ?? 'A lista está vazia.',
+        style: themeData.textTheme.headline5.merge(const TextStyle(color: Colors.white)),
         textAlign: TextAlign.center,
       ),
     );

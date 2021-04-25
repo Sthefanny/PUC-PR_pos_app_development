@@ -7,19 +7,19 @@ class SecureStorageRepository extends Disposable {
   SecureStorageRepository(this._storage);
 
   Future<String> getItem(String key) async {
-    return await _storage.read(key: key);
+    return _storage.read(key: key);
   }
 
-  void setItem(String key, String value) async {
-    return await _storage.write(key: key, value: value);
+  Future<void> setItem(String key, String value) async {
+    return _storage.write(key: key, value: value);
   }
 
-  void deleteItem(String key) async {
-    return await _storage.delete(key: key);
+  Future<void> deleteItem(String key) async {
+    return _storage.delete(key: key);
   }
 
-  void deleteAll() async {
-    return await _storage.deleteAll();
+  Future<void> deleteAll() async {
+    return _storage.deleteAll();
   }
 
   @override

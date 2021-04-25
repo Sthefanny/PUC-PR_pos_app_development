@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:storeroom_organizer/app/shared/configs/themes_config.dart';
+import '../configs/themes_config.dart';
 
 import '../helpers/form_helper.dart';
 
@@ -19,6 +19,8 @@ class TextFieldWidget extends StatelessWidget {
   final bool obscureText;
   final TextCapitalization textCapitalization;
   final String initialValue;
+  final bool readOnly;
+  final Function onTap;
 
   const TextFieldWidget({
     Key key,
@@ -36,6 +38,8 @@ class TextFieldWidget extends StatelessWidget {
     this.obscureText,
     this.textCapitalization,
     this.initialValue,
+    this.readOnly,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -44,7 +48,6 @@ class TextFieldWidget extends StatelessWidget {
       elevation: 1,
       borderRadius: BorderRadius.circular(10),
       child: TextFormField(
-        initialValue: null,
         controller: textEditingController,
         onChanged: onChanged,
         cursorColor: cursorColor,
@@ -53,11 +56,13 @@ class TextFieldWidget extends StatelessWidget {
         style: themeData.textTheme.bodyText1,
         decoration: FormHelper.getInputDecoration(hintText: hintText, suffixIcon: suffixIcon),
         inputFormatters: inputFormatters ?? [],
-        focusNode: focusNode ?? null,
+        focusNode: focusNode,
         onEditingComplete: onEditingComplete ?? () {},
         textInputAction: textInputAction ?? TextInputAction.done,
         obscureText: obscureText ?? false,
         textCapitalization: textCapitalization ?? TextCapitalization.sentences,
+        readOnly: readOnly ?? false,
+        onTap: onTap,
       ),
     );
   }

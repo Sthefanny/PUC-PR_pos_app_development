@@ -4,12 +4,17 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../shared/configs/colors_config.dart';
+import '../../../shared/configs/dio_config.dart';
 import '../../../shared/helpers/snackbar_messages_helper.dart';
 import '../../../shared/widgets/text_field_default.dart';
 import '../../loading/loading_controller.dart';
 import '../login_controller.dart';
 
 class SignIn extends StatefulWidget {
+  final BuildContext parentContext;
+
+  const SignIn({Key key, this.parentContext}) : super(key: key);
+
   @override
   _SignInState createState() => _SignInState();
 }
@@ -25,7 +30,7 @@ class _SignInState extends ModularState<SignIn, LoginController> {
     _size = MediaQuery.of(context).size;
 
     return Container(
-      padding: EdgeInsets.only(top: 23),
+      padding: const EdgeInsets.only(top: 23),
       child: ListView(
         padding: const EdgeInsets.all(0),
         children: <Widget>[
@@ -39,14 +44,14 @@ class _SignInState extends ModularState<SignIn, LoginController> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 10),
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   width: 300,
                   height: 210,
                   child: Column(
                     children: <Widget>[
                       loginField(),
-                      Padding(padding: const EdgeInsets.only(bottom: 20)),
+                      const Padding(padding: EdgeInsets.only(bottom: 20)),
                       passwordField(),
                     ],
                   ),
@@ -61,40 +66,36 @@ class _SignInState extends ModularState<SignIn, LoginController> {
   }
 
   Widget loginField() {
-    return Container(
-      child: TextFieldWidget(
-        cursorColor: ColorsConfig.purpleDark,
-        hintText: 'Email',
-        onChanged: controller.changeSigninLogin,
-        onEditingComplete: () => FocusScope.of(context).requestFocus(_focusPassword),
-        keyboardType: TextInputType.text,
-        textCapitalization: TextCapitalization.none,
-        focusNode: _focusLogin,
-        textInputAction: TextInputAction.next,
-      ),
+    return TextFieldWidget(
+      cursorColor: ColorsConfig.purpleDark,
+      hintText: 'Email',
+      onChanged: controller.changeSigninLogin,
+      onEditingComplete: () => FocusScope.of(context).requestFocus(_focusPassword),
+      keyboardType: TextInputType.text,
+      textCapitalization: TextCapitalization.none,
+      focusNode: _focusLogin,
+      textInputAction: TextInputAction.next,
     );
   }
 
   Widget passwordField() {
-    return Container(
-      child: Observer(
-        builder: (_) {
-          return TextFieldWidget(
-            cursorColor: ColorsConfig.purpleDark,
-            hintText: 'Senha',
-            obscureText: controller.signinObscurePass,
-            suffixIcon: IconButton(
-              icon: FaIcon(controller.signinObscurePass ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash, size: 18, color: ColorsConfig.textColor),
-              onPressed: controller.toggleSigninObscurePass,
-            ),
-            onChanged: controller.changeSigninPass,
-            keyboardType: TextInputType.text,
-            focusNode: _focusPassword,
-            textInputAction: TextInputAction.done,
-            onEditingComplete: controller.canSignIn ? _signIn : null,
-          );
-        },
-      ),
+    return Observer(
+      builder: (_) {
+        return TextFieldWidget(
+          cursorColor: ColorsConfig.purpleDark,
+          hintText: 'Senha',
+          obscureText: controller.signinObscurePass,
+          suffixIcon: IconButton(
+            icon: FaIcon(controller.signinObscurePass ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash, size: 18, color: ColorsConfig.textColor),
+            onPressed: controller.toggleSigninObscurePass,
+          ),
+          onChanged: controller.changeSigninPass,
+          keyboardType: TextInputType.text,
+          focusNode: _focusPassword,
+          textInputAction: TextInputAction.done,
+          onEditingComplete: controller.canSignIn ? _signIn : null,
+        );
+      },
     );
   }
 
@@ -103,7 +104,7 @@ class _SignInState extends ModularState<SignIn, LoginController> {
       child: Container(
         width: _size.width * 0.5,
         height: 50,
-        margin: EdgeInsets.only(top: 205),
+        margin: const EdgeInsets.only(top: 205),
         child: Observer(builder: (_) {
           return RaisedButton(
             shape: RoundedRectangleBorder(
@@ -113,11 +114,11 @@ class _SignInState extends ModularState<SignIn, LoginController> {
             disabledColor: ColorsConfig.disabledButton,
             textColor: Colors.white,
             disabledTextColor: Colors.grey,
+            onPressed: controller.canSignIn ? _signIn : null,
             child: Text(
               'Entrar'.toUpperCase(),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            onPressed: controller.canSignIn ? _signIn : null,
           );
         }),
       ),
@@ -131,11 +132,18 @@ class _SignInState extends ModularState<SignIn, LoginController> {
     controller.submitSignIn().then((result) {
       _loadingController.changeVisibility(false);
       if (result) {
-        Modular.to.pushReplacementNamed('/home');
+        Modular.to.pushReplacementNamed('/stores');
+      } else {
+        SnackbarMessages.showError(context: context, description: 'Ocorreu um erro, por favor tente novamente em alguns minutos.');
       }
-    }).catchError((error) {
+    }).catchError((error) async {
+      final errorHandled = await DioConfig.handleError(error);
+      if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
+        _loadingController.changeVisibility(false);
+        return _signIn();
+      }
       _loadingController.changeVisibility(false);
-      SnackbarMessages.showError(context: context, description: error);
+      SnackbarMessages.showError(context: context, description: errorHandled?.failure.toString());
     }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 }

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
 
-import '../../shared/configs/dio_config.dart';
 import '../../shared/extensions/string_extensions.dart';
 import '../../shared/models/requests/create_user_request.dart';
 import '../../shared/models/requests/login_request.dart';
+import '../../shared/models/responses/login_response.dart';
 import '../../shared/services/auth_service.dart';
 import 'login_store.dart';
 
@@ -35,22 +35,33 @@ abstract class _LoginControllerBase with Store {
   @computed
   String get signupConfirmPass => _loginStore.signupConfirmPass;
   @computed
+  String get daysToExpire => _loginStore.daysToExpire;
+  @computed
+  String get minimumShoppingList => _loginStore.minimumShoppingList;
+  @computed
   PageController get pageController => _loginStore.pageController;
 
   @action
-  changeSigninLogin(String value) => _loginStore.changeSigninLogin(value);
+  String changeSigninLogin(String value) => _loginStore.changeSigninLogin(value);
   @action
-  changeSigninPass(String value) => _loginStore.changeSigninPass(value);
+  String changeSigninPass(String value) => _loginStore.changeSigninPass(value);
   @action
-  changeSignupName(String value) => _loginStore.changeSignupName(value);
+  String changeSignupName(String value) => _loginStore.changeSignupName(value);
   @action
-  changeSignupLogin(String value) => _loginStore.changeSignupLogin(value);
+  String changeSignupLogin(String value) => _loginStore.changeSignupLogin(value);
   @action
-  changeSignupPass(String value) => _loginStore.changeSignupPass(value);
+  String changeSignupPass(String value) => _loginStore.changeSignupPass(value);
   @action
-  changeSignupConfirmPass(String value) => _loginStore.changeSignupConfirmPass(value);
+  String changeSignupConfirmPass(String value) => _loginStore.changeSignupConfirmPass(value);
   @action
-  changePageController(int value) => _loginStore.changePageController(value);
+  String changeDaysToExpire(String value) => _loginStore.changeDaysToExpire(value);
+  @action
+  String changeMinimumShoppingList(String value) => _loginStore.changeMinimumShoppingList(value);
+
+  @action
+  Future<void> changePageController(int value) {
+    return _loginStore.pageController?.animateToPage(value, duration: const Duration(milliseconds: 500), curve: Curves.decelerate);
+  }
 
   //end Store replication
 
@@ -62,11 +73,11 @@ abstract class _LoginControllerBase with Store {
   bool signupObscureConfirmPass = true;
 
   @action
-  toggleSigninObscurePass() => signinObscurePass = !signinObscurePass;
+  bool toggleSigninObscurePass() => signinObscurePass = !signinObscurePass;
   @action
-  toggleSignupObscurePass() => signupObscurePass = !signupObscurePass;
+  bool toggleSignupObscurePass() => signupObscurePass = !signupObscurePass;
   @action
-  toggleSignupObscureConfirmPass() => signupObscureConfirmPass = !signupObscureConfirmPass;
+  bool toggleSignupObscureConfirmPass() => signupObscureConfirmPass = !signupObscureConfirmPass;
 
   @computed
   bool get canSignIn => signinLogin.isNotNullOrEmpty() && signinPass.isNotNullOrEmpty();
@@ -75,31 +86,45 @@ abstract class _LoginControllerBase with Store {
   bool get isPassEqual => signupPass.isNotNullOrEmpty() && signupConfirmPass.isNotNullOrEmpty() && signupPass == signupConfirmPass;
 
   @computed
-  bool get canSignUp => signupName.isNotNullOrEmpty() && signupLogin.isNotNullOrEmpty() && signupPass.isNotNullOrEmpty() && signupConfirmPass.isNotNullOrEmpty();
+  bool get canSignUp =>
+      signupName.isNotNullOrEmpty() &&
+      signupLogin.isNotNullOrEmpty() &&
+      signupPass.isNotNullOrEmpty() &&
+      signupConfirmPass.isNotNullOrEmpty() &&
+      daysToExpire.isNotNullOrEmpty() &&
+      minimumShoppingList.isNotNullOrEmpty();
 
   @action
   Future<bool> submitSignIn() async {
-    if (canSignIn) {
-      var request = LoginRequest(email: signinLogin, password: signinPass);
-      var response;
+    try {
+      if (canSignIn) {
+        final request = LoginRequest(email: signinLogin, password: signinPass);
+        LoginResponse response;
 
-      await _authService.login(request).then((result) => response = result).catchError(DioConfig.handleError);
+        await _authService.login(request).then((result) {
+          response = result;
+        });
 
-      return response != null ? true : false;
+        return response != null ?? false;
+      }
+      return false;
+    } catch (e) {
+      rethrow;
     }
-    return false;
   }
 
   @action
-  Future<bool> submitSignUp() async {
-    if (canSignUp) {
-      var request = CreateUserRequest(name: signupName, email: signupLogin, password: signupPass);
-      var response;
+  Future<LoginResponse> submitSignUp() async {
+    try {
+      LoginResponse response;
+      if (canSignUp) {
+        final request = CreateUserRequest(name: signupName, email: signupLogin, password: signupPass);
 
-      await _authService.createUser(request).then((result) => response = result).catchError(DioConfig.handleError);
-
-      return response != null ? true : false;
+        response = await _authService.createUser(request).then((result) async => result);
+      }
+      return response;
+    } catch (e) {
+      rethrow;
     }
-    return false;
   }
 }

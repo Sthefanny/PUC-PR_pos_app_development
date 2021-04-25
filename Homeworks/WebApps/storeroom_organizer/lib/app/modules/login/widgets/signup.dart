@@ -4,6 +4,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../shared/configs/colors_config.dart';
+import '../../../shared/configs/dio_config.dart';
 import '../../../shared/helpers/snackbar_messages_helper.dart';
 import '../../../shared/widgets/text_field_default.dart';
 import '../../loading/loading_controller.dart';
@@ -20,10 +21,14 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
   final _focusLogin = FocusNode();
   final _focusPassword = FocusNode();
   final _focusConfirmPass = FocusNode();
+  final _focusDaysToExpire = FocusNode();
+  final _focusMinimumShoppingList = FocusNode();
   final _nameController = TextEditingController();
   final _loginController = TextEditingController();
   final _passController = TextEditingController();
   final _confirmPassController = TextEditingController();
+  final _daysToExpireController = TextEditingController();
+  final _minimumShoppingListController = TextEditingController();
   Size _size;
 
   @override
@@ -31,7 +36,7 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
     _size = MediaQuery.of(context).size;
 
     return Container(
-      padding: EdgeInsets.only(top: 23),
+      padding: const EdgeInsets.only(top: 23),
       child: ListView(
         padding: const EdgeInsets.all(0),
         children: <Widget>[
@@ -45,17 +50,19 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 5),
-                  margin: EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.only(top: 5, bottom: 20),
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
                   width: 300,
                   height: 320,
                   child: ListView(
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                     children: <Widget>[
                       nameField(),
                       loginField(),
                       passwordField(),
                       confirmPassField(),
+                      daysToExpireField(),
+                      minimumShoppingListField(),
                     ],
                   ),
                 ),
@@ -69,17 +76,15 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
   }
 
   Widget nameField() {
-    return Container(
-      child: TextFieldWidget(
-        cursorColor: ColorsConfig.purpleDark,
-        hintText: 'Nome',
-        onChanged: controller.changeSignupName,
-        keyboardType: TextInputType.text,
-        focusNode: _focusName,
-        textEditingController: _nameController,
-        textInputAction: TextInputAction.next,
-        onEditingComplete: () => FocusScope.of(context).requestFocus(_focusLogin),
-      ),
+    return TextFieldWidget(
+      cursorColor: ColorsConfig.purpleDark,
+      hintText: 'Nome',
+      onChanged: controller.changeSignupName,
+      keyboardType: TextInputType.text,
+      focusNode: _focusName,
+      textEditingController: _nameController,
+      textInputAction: TextInputAction.next,
+      onEditingComplete: () => FocusScope.of(context).requestFocus(_focusLogin),
     );
   }
 
@@ -101,26 +106,24 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
   }
 
   Widget passwordField() {
-    return Container(
-      child: Observer(
-        builder: (_) {
-          return TextFieldWidget(
-            cursorColor: ColorsConfig.purpleDark,
-            hintText: 'Senha',
-            obscureText: controller.signupObscurePass,
-            suffixIcon: IconButton(
-              icon: FaIcon(controller.signupObscurePass ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash, size: 18, color: ColorsConfig.textColor),
-              onPressed: controller.toggleSignupObscurePass,
-            ),
-            onChanged: controller.changeSignupPass,
-            keyboardType: TextInputType.text,
-            focusNode: _focusPassword,
-            textEditingController: _passController,
-            textInputAction: TextInputAction.next,
-            onEditingComplete: () => FocusScope.of(context).requestFocus(_focusConfirmPass),
-          );
-        },
-      ),
+    return Observer(
+      builder: (_) {
+        return TextFieldWidget(
+          cursorColor: ColorsConfig.purpleDark,
+          hintText: 'Senha',
+          obscureText: controller.signupObscurePass,
+          suffixIcon: IconButton(
+            icon: FaIcon(controller.signupObscurePass ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash, size: 18, color: ColorsConfig.textColor),
+            onPressed: controller.toggleSignupObscurePass,
+          ),
+          onChanged: controller.changeSignupPass,
+          keyboardType: TextInputType.text,
+          focusNode: _focusPassword,
+          textEditingController: _passController,
+          textInputAction: TextInputAction.next,
+          onEditingComplete: () => FocusScope.of(context).requestFocus(_focusConfirmPass),
+        );
+      },
     );
   }
 
@@ -142,9 +145,43 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
             focusNode: _focusConfirmPass,
             textEditingController: _confirmPassController,
             textInputAction: TextInputAction.done,
-            onEditingComplete: controller.canSignUp ? _signUp : null,
+            onEditingComplete: () => FocusScope.of(context).requestFocus(_focusDaysToExpire),
           );
         },
+      ),
+    );
+  }
+
+  Widget daysToExpireField() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: TextFieldWidget(
+        cursorColor: ColorsConfig.purpleDark,
+        hintText: 'Alerta de expiração',
+        onChanged: controller.changeDaysToExpire,
+        keyboardType: TextInputType.number,
+        focusNode: _focusDaysToExpire,
+        textEditingController: _daysToExpireController,
+        textCapitalization: TextCapitalization.none,
+        textInputAction: TextInputAction.next,
+        onEditingComplete: () => FocusScope.of(context).requestFocus(_focusMinimumShoppingList),
+      ),
+    );
+  }
+
+  Widget minimumShoppingListField() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: TextFieldWidget(
+        cursorColor: ColorsConfig.purpleDark,
+        hintText: 'Mínimo para lista de compras',
+        onChanged: controller.changeMinimumShoppingList,
+        keyboardType: TextInputType.number,
+        focusNode: _focusMinimumShoppingList,
+        textEditingController: _minimumShoppingListController,
+        textCapitalization: TextCapitalization.none,
+        textInputAction: TextInputAction.next,
+        onEditingComplete: controller.canSignUp ? _signUp : null,
       ),
     );
   }
@@ -154,7 +191,7 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
       child: Container(
         width: _size.width * 0.5,
         height: 50,
-        margin: EdgeInsets.only(top: 295),
+        margin: const EdgeInsets.only(top: 295),
         child: Observer(builder: (_) {
           return RaisedButton(
             shape: RoundedRectangleBorder(
@@ -164,11 +201,11 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
             disabledColor: ColorsConfig.disabledButton,
             textColor: Colors.white,
             disabledTextColor: Colors.grey,
+            onPressed: controller.canSignUp ? _signUp : null,
             child: Text(
               'Criar'.toUpperCase(),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            onPressed: controller.canSignUp ? _signUp : null,
           );
         }),
       ),
@@ -187,14 +224,22 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
 
     controller.submitSignUp().then((result) {
       _loadingController.changeVisibility(false);
-      if (result) {
+      if (result != null) {
         SnackbarMessages.showSuccess(context: context, description: 'Usuário criado com sucesso!');
         _clearAllFields();
         controller.changePageController(0);
+      } else {
+        _loadingController.changeVisibility(false);
+        SnackbarMessages.showError(context: context, description: 'Ocorreu um erro, por favor tente novamente em alguns minutos.');
       }
-    }).catchError((error) {
+    }).catchError((error) async {
+      final errorHandled = await DioConfig.handleError(error);
+      if (errorHandled != null && errorHandled.success != null && errorHandled.success) {
+        _loadingController.changeVisibility(false);
+        return _signUp();
+      }
       _loadingController.changeVisibility(false);
-      SnackbarMessages.showError(context: context, description: error);
+      SnackbarMessages.showError(context: context, description: errorHandled?.failure.toString());
     }).whenComplete(() => _loadingController.changeVisibility(false));
   }
 
@@ -203,9 +248,12 @@ class _SignUpState extends ModularState<SignUp, LoginController> {
     _loginController.clear();
     _passController.clear();
     _confirmPassController.clear();
-    controller.changeSignupName('');
-    controller.changeSignupLogin('');
-    controller.changeSignupPass('');
-    controller.changeSignupConfirmPass('');
+    _daysToExpireController.clear();
+    _minimumShoppingListController.clear();
+    controller
+      ..changeSignupName('')
+      ..changeSignupLogin('')
+      ..changeSignupPass('')
+      ..changeSignupConfirmPass('');
   }
 }
