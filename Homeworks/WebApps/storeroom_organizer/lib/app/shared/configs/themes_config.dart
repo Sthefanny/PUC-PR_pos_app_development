@@ -6,6 +6,7 @@ import 'colors_config.dart';
 final ThemeData themeData = ThemeData(
   primaryColor: ColorsConfig.purpleDark,
   accentColor: ColorsConfig.button,
+  unselectedWidgetColor: ColorsConfig.button,
   textTheme: TextTheme(
     headline1: GoogleFonts.reemKufi(fontWeight: FontWeight.w300, fontSize: 96, letterSpacing: -1.5, color: ColorsConfig.textColor),
     headline2: GoogleFonts.reemKufi(fontWeight: FontWeight.w300, fontSize: 60, letterSpacing: -0.5, color: ColorsConfig.textColor),

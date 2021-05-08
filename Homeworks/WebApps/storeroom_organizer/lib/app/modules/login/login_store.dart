@@ -18,22 +18,26 @@ abstract class _LoginStoreBase with Store {
   @observable
   String signupConfirmPass;
   @observable
+  String daysToExpire;
+  @observable
+  String minimumShoppingList;
+  @observable
   PageController pageController = PageController();
 
   @action
-  changeSigninLogin(String value) => signinLogin = value;
+  String changeSigninLogin(String value) => signinLogin = value;
   @action
-  changeSigninPass(String value) => signinPass = value;
+  String changeSigninPass(String value) => signinPass = value;
   @action
-  changeSignupName(String value) => signupName = value;
+  String changeSignupName(String value) => signupName = value;
   @action
-  changeSignupLogin(String value) => signupLogin = value;
+  String changeSignupLogin(String value) => signupLogin = value;
   @action
-  changeSignupPass(String value) => signupPass = value;
+  String changeSignupPass(String value) => signupPass = value;
   @action
-  changeSignupConfirmPass(String value) => signupConfirmPass = value;
+  String changeSignupConfirmPass(String value) => signupConfirmPass = value;
   @action
-  changePageController(int value) {
-    pageController?.animateToPage(value, duration: Duration(milliseconds: 500), curve: Curves.decelerate);
-  }
+  String changeDaysToExpire(String value) => daysToExpire = value;
+  @action
+  String changeMinimumShoppingList(String value) => minimumShoppingList = value;
 }

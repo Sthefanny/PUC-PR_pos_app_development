@@ -5,19 +5,17 @@ part 'store_response.g.dart';
 @JsonSerializable()
 class StoreResponse {
   final int id;
-  final int unitMea;
-  final String product;
-  final int productId;
-  final double quantity;
-  final String imageUrl;
+  final String name;
+  final String description;
+  final int totalItems;
+  final bool expiredItems;
 
   StoreResponse({
     this.id,
-    this.unitMea,
-    this.product,
-    this.productId,
-    this.quantity,
-    this.imageUrl,
+    this.name,
+    this.description,
+    this.totalItems,
+    this.expiredItems,
   });
 
   factory StoreResponse.fromJson(Map<String, dynamic> json) => _$StoreResponseFromJson(json);

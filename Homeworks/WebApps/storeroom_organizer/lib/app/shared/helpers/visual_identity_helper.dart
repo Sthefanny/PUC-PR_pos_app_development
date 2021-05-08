@@ -6,13 +6,12 @@ import '../configs/themes_config.dart';
 
 class VisualIdentityHelper {
   static BoxDecoration buildBackground() {
-    var background = BoxDecoration(
+    const background = BoxDecoration(
       gradient: LinearGradient(
         colors: [ColorsConfig.purpleDark, ColorsConfig.purpleLight],
-        begin: const FractionalOffset(0, 0),
-        end: const FractionalOffset(1, 1),
+        begin: FractionalOffset(0, 0),
+        end: FractionalOffset(1, 1),
         stops: [0, 1],
-        tileMode: TileMode.clamp,
       ),
     );
 
@@ -22,7 +21,7 @@ class VisualIdentityHelper {
   static Widget buildLogo({@required double logoWidth, double fontSize}) {
     return SafeArea(
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 40),
+        margin: const EdgeInsets.symmetric(vertical: 40),
         child: Column(
           children: [
             Image.asset(

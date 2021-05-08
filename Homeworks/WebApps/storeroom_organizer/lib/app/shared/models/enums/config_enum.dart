@@ -2,7 +2,8 @@ import 'package:flutter/foundation.dart';
 
 enum ConfigurationEnum {
   token,
-  userName,
+  refreshToken,
+  userData,
 }
 
 extension ConfigurationEnumToStr on ConfigurationEnum {

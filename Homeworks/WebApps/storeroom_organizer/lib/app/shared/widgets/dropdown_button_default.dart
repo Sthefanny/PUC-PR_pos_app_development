@@ -25,7 +25,7 @@ class DropdownButtonWidget<T> extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       child: DropdownButtonFormField(
         value: value,
-        icon: FaIcon(FontAwesomeIcons.chevronDown),
+        icon: const FaIcon(FontAwesomeIcons.chevronDown),
         iconSize: 24,
         elevation: 16,
         decoration: FormHelper.getInputDecoration(hintText: hintText),

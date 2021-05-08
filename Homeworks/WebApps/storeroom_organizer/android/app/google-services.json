@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "470439195268",
+    "firebase_url": "https://finance-379ae.firebaseio.com",
+    "project_id": "finance-379ae",
+    "storage_bucket": "finance-379ae.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470439195268:android:84f41fb0283f00b88788d1",
+        "android_client_info": {
+          "package_name": "com.sthefanny.storeroom_organizer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "470439195268-fmfrqntcdo5pfuqrnfuaa11gug31egbi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSdAeMr6ie6YDjt5-NX2GUZerGlQJ65bM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "470439195268-fmfrqntcdo5pfuqrnfuaa11gug31egbi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "470439195268-32l4oodq7nfemhtkjlkfuup6fa3016va.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.stel.finance"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
