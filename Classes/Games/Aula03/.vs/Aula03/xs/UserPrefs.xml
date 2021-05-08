@@ -1,0 +1,25 @@
+﻿<Properties StartupConfiguration="{C8D2F8D4-1D4C-C03F-E9C9-02BFEB9B7643}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Cannon.cs">
+    <Files>
+      <File FileName="Assets/Scripts/Cannon.cs" Line="18" Column="14" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Aula03" expanded="True">
+            <Node name="Assets" expanded="True" selected="True">
+              <Node name="Scripts" expanded="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="0185338f-37f5-4693-a67d-236a9af7ebbe" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
