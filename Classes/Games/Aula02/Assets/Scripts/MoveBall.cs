@@ -43,8 +43,7 @@ public class MoveBall : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("chest"))
         {
-            jumpSpeed = 0;
-            moveSpeed = 0;
+            rb.constraints = RigidbodyConstraints.FreezeAll;
             Destroy(collision.gameObject);
             addPointsToScore(100);
         }
